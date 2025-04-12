@@ -67,7 +67,7 @@ public class NFConnector {
 
 
 
-	public InetSocketAddress getServerAddr() {
+	//public InetSocketAddress getServerAddr() {
 		return serverAddr;
 	}
 
