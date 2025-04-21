@@ -40,6 +40,27 @@ public class NFControllerLogicP2P {
 		if (fileServer != null) {
 			System.err.println("File server is already running");
 		} else {
+			
+			try {
+				fileServer = new NFServer();
+				fileServer.start();
+				int puerto = fileServer.PORT;
+				if(puerto <= 0) {
+					System.err.println("Puerto no válido");
+				}
+				else {
+					System.out.println("File server started and listening on port: " + puerto);
+					serverRunning = true;
+					
+				}
+				
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
 
 			/*
 			 * TODO: (Boletín Servidor TCP concurrente) Arrancar servidor en segundo plano

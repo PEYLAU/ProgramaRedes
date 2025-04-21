@@ -46,9 +46,7 @@ public class NFConnector {
 	
 	
 	
-	// bombona de botano 
-	//zurullo mierdal
-
+	
 	public void test() {
 		/*
 		 * TODO: (Boletín SocketsTCP) Enviar entero cualquiera a través del socket y
@@ -72,7 +70,7 @@ public class NFConnector {
 
 
 
-	//public InetSocketAddress getServerAddr() {
+	public InetSocketAddress getServerAddr() {
 		return serverAddr;
 	}
 

@@ -15,7 +15,7 @@ import es.um.redes.nanoFiles.tcp.message.PeerMessageOps;
 
 
 
-public class NFServer implements Runnable {
+public class NFServer extends Thread implements Runnable {
 
 	public static final int PORT = 10000;
 
@@ -102,6 +102,23 @@ public class NFServer implements Runnable {
 		 * TODO: (Boletín SocketsTCP) Usar el socket servidor para esperar conexiones de
 		 * otros peers que soliciten descargar ficheros
 		 */
+		while(true) {
+			try {
+				Socket socket = serverSocket.accept();
+				
+				NFServerThread serverThread = new NFServerThread(socket);
+				serverThread.start();
+				
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+		}
+		
+		
 		/*
 		 * TODO: (Boletín SocketsTCP) Al establecerse la conexión con un peer, la
 		 * comunicación con dicho cliente se hace en el método
