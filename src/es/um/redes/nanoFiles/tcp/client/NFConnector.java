@@ -43,6 +43,10 @@ public class NFConnector {
 		dos = new DataOutputStream(socket.getOutputStream());
 
 	}
+	
+	
+	
+	// bombona de botano
 
 	public void test() {
 		/*
