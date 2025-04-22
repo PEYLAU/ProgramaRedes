@@ -30,7 +30,7 @@ public class NFDirectoryServer {
 	 * funcionalidad del sistema nanoFilesP2P: ficheros publicados, servidores
 	 * registrados, etc.
 	 */
-	private Map<String, FileInfo[]> files;
+	private Map<String, LinkedList<FileInfo>> files;
 
 
 
@@ -268,27 +268,6 @@ public class NFDirectoryServer {
 		case DirMessageOps.OPERATION_PING: {
 
 
-
-
-			/*
-			 * TODO: (Boletín MensajesASCII) Comprobamos si el protocolId del mensaje del
-			 * cliente coincide con el nuestro.
-			 */
-			
-			
-			
-			/*
-			 * TODO: (Boletín MensajesASCII) Construimos un mensaje de respuesta que indique
-			 * el éxito/fracaso del ping (compatible, incompatible), y lo devolvemos como
-			 * resultado del método.
-			 */
-			
-			
-			/*
-			 * TODO: (Boletín MensajesASCII) Imprimimos por pantalla el resultado de
-			 * procesar la petición recibida (éxito o fracaso) con los datos relevantes, a
-			 * modo de depuración en el servidor
-			 */
 			if(responseMessage.getProtocolId().equals(NanoFiles.PROTOCOL_ID)){
 				msgToSend = new DirMessage(DirMessageOps.OPERATION_PING_OK);
 				
@@ -301,7 +280,41 @@ public class NFDirectoryServer {
 
 			break;
 		}
-		
+		case DirMessageOps.OPERATION_SEND_FILES: {
+			int serverPort = responseMessage.getServerPort();
+			int fileNum = Integer.parseInt(responseMessage.getFileNum());
+			for(int i = 0; i < fileNum; i++) {
+				FileInfo f = responseMessage.getFileFromPos(i);
+				f.setServerPort(serverPort);
+				if(!files.containsKey(f.fileName)) {
+					files.put(f.fileName, new LinkedList<FileInfo>());	
+				}
+				files.get(f.fileName).add(f);
+				
+			}
+			
+			msgToSend = new DirMessage(DirMessageOps.OPERATION_SERVER_REGISTERED);
+			System.out.println("Message to respond with: " + msgToSend.toString());
+			
+			break;
+		}
+
+
+
+		/*
+		 * TODO: (Boletín MensajesASCII) Comprobamos si el protocolId del mensaje del
+		 * cliente coincide con el nuestro.
+		 */
+		/*
+		 * TODO: (Boletín MensajesASCII) Construimos un mensaje de respuesta que indique
+		 * el éxito/fracaso del ping (compatible, incompatible), y lo devolvemos como
+		 * resultado del método.
+		 */
+		/*
+		 * TODO: (Boletín MensajesASCII) Imprimimos por pantalla el resultado de
+		 * procesar la petición recibida (éxito o fracaso) con los datos relevantes, a
+		 * modo de depuración en el servidor
+		 */
 
 
 

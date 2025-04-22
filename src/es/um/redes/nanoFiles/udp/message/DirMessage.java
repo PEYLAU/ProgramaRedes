@@ -29,6 +29,7 @@ public class DirMessage {
 	private static final String FIELDNAME_FILE_NAME = "filename";
 	private static final String FIELDNAME_FILE_PATH = "filepath";
 	private static final String FIELDNAME_FILE_SIZE = "filesize";
+	private static final String FIELDNAME_SERVER_PORT = "serverport";
 	/*
 	 * TODO: (Boletín MensajesASCII) Definir de manera simbólica los nombres de
 	 * todos los campos que pueden aparecer en los mensajes de este protocolo
@@ -46,6 +47,7 @@ public class DirMessage {
 	 */
 	private String protocolId;
 	private String fileNum;
+	private int serverPort;
 	private LinkedList<String> fileHashes;
 	private LinkedList<String> fileNames;
 	private LinkedList<String> filePaths;
@@ -108,11 +110,27 @@ public class DirMessage {
 		fileNum = value;
 	}
 	
+	public int getServerPort() {
+		return serverPort;
+	}
+	
+	public void setServerPort(int sp) {
+		if (!operation.equals(DirMessageOps.OPERATION_SEND_FILES)) {
+			throw new RuntimeException(
+					"DirMessage: setServerPort called for message of unexpected type (" + operation + ")");
+		}
+		this.serverPort = sp;
+	}
+	
 	public void addFileInfo(FileInfo f) {
 		fileHashes.add(f.fileHash);
 		fileNames.add(f.fileName);
 		filePaths.add(f.filePath);
 		fileSizes.add(String.valueOf(f.fileSize));
+	}
+	
+	public FileInfo getFileFromPos(int i) {
+		return new FileInfo(fileHashes.get(i),fileNames.get(i),Long.parseLong(fileSizes.get(i)), filePaths.get(i));
 	}
 	
 
@@ -164,6 +182,10 @@ public class DirMessage {
 			}
 			case FIELDNAME_PROTOCOL:{
 				m.setProtocolID(value);
+				break;
+			}
+			case FIELDNAME_SERVER_PORT:{
+				m.setServerPort(Integer.parseInt(value));
 				break;
 			}
 			case FIELDNAME_FILE_NUM:{
@@ -228,6 +250,7 @@ public class DirMessage {
 			break;
 		}
 		case DirMessageOps.OPERATION_SEND_FILES:{
+			sb.append(FIELDNAME_SERVER_PORT + DELIMITER + serverPort + END_LINE);
 			sb.append(FIELDNAME_FILE_NUM + DELIMITER + fileNum + END_LINE);
 			for(int i = 0; i < Integer.parseInt(fileNum); i++) {
 				sb.append(FIELDNAME_FILE_HASH + DELIMITER + fileHashes.get(i) + END_LINE);

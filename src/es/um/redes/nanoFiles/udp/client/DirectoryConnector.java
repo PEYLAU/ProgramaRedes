@@ -318,6 +318,7 @@ public class DirectoryConnector {
 		// TODO: Ver TODOs en pingDirectory y seguir esquema similar
 		
 		DirMessage m = new DirMessage(DirMessageOps.OPERATION_SEND_FILES);
+		m.setServerPort(serverPort);
 		m.setFileNum(String.valueOf(files.length));
 		for(FileInfo f : files) {
 			m.addFileInfo(f);
@@ -329,7 +330,7 @@ public class DirectoryConnector {
 		if(buffrespuesta != null) {
 			String buffrespuestaString = new String(buffrespuesta, 0, buffrespuesta.length);
 			DirMessage messageResponse = DirMessage.fromString(buffrespuestaString);
-			if(messageResponse != null && messageResponse.getOperation().startsWith(DirMessageOps.OPERATION_PING_OK)) {
+			if(messageResponse != null && messageResponse.getOperation().startsWith(DirMessageOps.OPERATION_SERVER_REGISTERED)) {
 				success = true;
 			}
 		}

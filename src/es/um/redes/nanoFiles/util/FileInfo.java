@@ -19,6 +19,7 @@ public class FileInfo {
 	public String fileName;
 	public String filePath;
 	public long fileSize = -1;
+	public int serverPort;
 
 	public FileInfo(String hash, String name, long size, String path) {
 		fileHash = hash;
@@ -28,6 +29,10 @@ public class FileInfo {
 	}
 
 	public FileInfo() {
+	}
+	
+	public void setServerPort(int sp) {
+		this.serverPort = sp;
 	}
 
 	public String toString() {
