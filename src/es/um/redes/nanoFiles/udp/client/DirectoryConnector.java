@@ -72,7 +72,7 @@ public class DirectoryConnector {
 
 		
 		socket = new DatagramSocket();
-		socket.setSoTimeout(TIMEOUT);
+		
 
 
 	}
@@ -106,23 +106,13 @@ public class DirectoryConnector {
 		 * recibidos, *NO* el búfer de recepción al completo.
 		 */
 		
-		DatagramPacket packettoServer = new DatagramPacket(requestData, requestData.length, directoryAddress);
-		try {
-			socket.send(packettoServer);
-		}catch(IOException e) {
-			System.err.println("IOException when sending DatagramPacket");
-			System.exit(1);
-		}
 		
-		DatagramPacket packetfromServer = new DatagramPacket(responseData, responseData.length);
+		
+		DatagramPacket packetfromServer = null;
 		boolean succeded = true;
-		try {
-			socket.receive(packetfromServer);
-		}catch(SocketTimeoutException s) {
-			succeded = false;
-			for(int i = 0; i < MAX_NUMBER_OF_ATTEMPTS; i++) {
-				
-				
+		for(int i = 0; i < MAX_NUMBER_OF_ATTEMPTS; i++) {
+				succeded = true;
+				DatagramPacket packettoServer = new DatagramPacket(requestData, requestData.length, directoryAddress);
 				
 				try {
 					socket.send(packettoServer);
@@ -131,36 +121,37 @@ public class DirectoryConnector {
 					System.exit(1);
 				}
 				
+				packetfromServer = new DatagramPacket(responseData, responseData.length);
+				
 				try {
+					socket.setSoTimeout(TIMEOUT);
 					socket.receive(packetfromServer);
 				}catch(SocketTimeoutException s2) {
+					succeded = false;
+					System.err.println("TIMEOUT, Nº OF RETRIES: " + (i+1));
 					continue;
 				}
 				catch(IOException e) {
 					System.err.println("IOException when receiving DatagramPacket");
 					System.exit(1);
 				}
-				succeded = true;
-				break;
-				
-				
-				
+				if(succeded) {
+					break;
+				}
+		
 			}
+		
+				if(!succeded) {
+					return null;
+				}
+				response = Arrays.copyOf(responseData, packetfromServer.getLength());
 			
+				return response;
 			
-			
-		}
-		catch(IOException e) {
-			System.err.println("IOException when receiving DatagramPacket");
-			System.exit(1);
 		}
 		
-		if(!succeded) {
-			System.err.println("SocketTimeoutException when receiving DatagramPacket");
-			System.exit(1);
-		}
 		
-		response = Arrays.copyOf(responseData, packetfromServer.getLength());
+		
 	
 		
 		
@@ -185,12 +176,6 @@ public class DirectoryConnector {
 
 
 
-		if (response != null && response.length == responseData.length) {
-			System.err.println("Your response is as large as the datagram reception buffer!!\n"
-					+ "You must extract from the buffer only the bytes that belong to the datagram!");
-		}
-		return response;
-	}
 
 	/**
 	 * Método para probar la comunicación con el directorio mediante el envío y

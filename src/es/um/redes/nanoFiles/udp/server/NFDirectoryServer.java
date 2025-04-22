@@ -30,7 +30,7 @@ public class NFDirectoryServer {
 	 * funcionalidad del sistema nanoFilesP2P: ficheros publicados, servidores
 	 * registrados, etc.
 	 */
-	private Map<String, LinkedList<FileInfo>> files;
+	private Map<String, LinkedList<FileInfo>> files = new HashMap<String, LinkedList<FileInfo>>();
 
 
 
@@ -201,7 +201,7 @@ public class NFDirectoryServer {
 	public void run() throws IOException {
 
 		System.out.println("Directory starting...");
-
+		
 		while (true) { // Bucle principal del servidor de directorio
 			DatagramPacket rcvDatagram = receiveDatagram();
 

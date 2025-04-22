@@ -3,6 +3,7 @@ package es.um.redes.nanoFiles.tcp.server;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
+import java.io.IOException;
 import java.net.Socket;
 
 import es.um.redes.nanoFiles.tcp.message.PeerMessage;
@@ -23,24 +24,11 @@ public class NFServerThread extends Thread {
 	}
 	
 	public void run() {
-		try {
-			boolean terminate = false;
-			while(!terminate) {
-					NFServer.serveFilesToClient(socket);
-			}
-				
-			
-			
-			
-		}catch (EOFException e) {
-			e.printStackTrace();
-		}catch (IOException e) {
-			e.printStackTrace();
-			
+		boolean terminate = false;
+		while(!terminate) {
+			NFServer.serveFilesToClient(socket);
 		}
-		
-		
-		
+
 	}
 
 

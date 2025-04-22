@@ -48,10 +48,10 @@ public class DirMessage {
 	private String protocolId;
 	private String fileNum;
 	private int serverPort;
-	private LinkedList<String> fileHashes;
-	private LinkedList<String> fileNames;
-	private LinkedList<String> filePaths;
-	private LinkedList<String> fileSizes;
+	private LinkedList<String> fileHashes = new LinkedList<String>();
+	private LinkedList<String> fileNames = new LinkedList<String>();
+	private LinkedList<String> filePaths = new LinkedList<String>();
+	private LinkedList<Long> fileSizes = new LinkedList<Long>();
 	/*
 	 * TODO: (Boletín MensajesASCII) Crear un atributo correspondiente a cada uno de
 	 * los campos de los diferentes mensajes de este protocolo.
@@ -126,11 +126,11 @@ public class DirMessage {
 		fileHashes.add(f.fileHash);
 		fileNames.add(f.fileName);
 		filePaths.add(f.filePath);
-		fileSizes.add(String.valueOf(f.fileSize));
+		fileSizes.add(f.fileSize);
 	}
 	
 	public FileInfo getFileFromPos(int i) {
-		return new FileInfo(fileHashes.get(i),fileNames.get(i),Long.parseLong(fileSizes.get(i)), filePaths.get(i));
+		return new FileInfo(fileHashes.get(i),fileNames.get(i),fileSizes.get(i), filePaths.get(i));
 	}
 	
 
@@ -207,6 +207,7 @@ public class DirMessage {
 			case FIELDNAME_FILE_SIZE:{
 				currSize = value;
 				f = new FileInfo(currHash, currName, Long.parseLong(currSize), currPath);
+				m.addFileInfo(f);
 				break;
 			}
 			
