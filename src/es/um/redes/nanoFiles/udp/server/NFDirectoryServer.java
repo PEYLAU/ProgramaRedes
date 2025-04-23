@@ -281,11 +281,9 @@ public class NFDirectoryServer {
 			break;
 		}
 		case DirMessageOps.OPERATION_SEND_FILES: {
-			int serverPort = responseMessage.getServerPort();
-			int fileNum = Integer.parseInt(responseMessage.getFileNum());
+			int fileNum = responseMessage.getFileNum();
 			for(int i = 0; i < fileNum; i++) {
 				FileInfo f = responseMessage.getFileFromPos(i);
-				f.setServerPort(serverPort);
 				if(!files.containsKey(f.fileName)) {
 					files.put(f.fileName, new LinkedList<FileInfo>());	
 				}
@@ -296,6 +294,22 @@ public class NFDirectoryServer {
 			msgToSend = new DirMessage(DirMessageOps.OPERATION_SERVER_REGISTERED);
 			System.out.println("Message to respond with: " + msgToSend.toString());
 			
+			break;
+		}
+		case DirMessageOps.OPERATION_REQUEST_FILELIST: {
+			
+			msgToSend = new DirMessage(DirMessageOps.OPERATION_SEND_FILES);
+			int size = 0;
+			for(LinkedList<FileInfo> l : files.values()) {
+				size += l.size();
+				for(FileInfo f : l) {
+					int port = f.fileAddress.getPort();
+					f.fileAddress = new InetSocketAddress(pkt.getAddress(), port);
+					msgToSend.addFileInfo(f);
+				}
+			}
+			msgToSend.setFileNum(size);
+			System.out.println("Message to respond with: " + msgToSend.toString());
 			break;
 		}
 

@@ -1,6 +1,7 @@
 package es.um.redes.nanoFiles.util;
 
 import java.io.File;
+import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -19,7 +20,8 @@ public class FileInfo {
 	public String fileName;
 	public String filePath;
 	public long fileSize = -1;
-	public int serverPort;
+	public InetSocketAddress fileAddress;
+	
 
 	public FileInfo(String hash, String name, long size, String path) {
 		fileHash = hash;
@@ -31,10 +33,7 @@ public class FileInfo {
 	public FileInfo() {
 	}
 	
-	public void setServerPort(int sp) {
-		this.serverPort = sp;
-	}
-
+	
 	public String toString() {
 		StringBuffer strBuf = new StringBuffer();
 

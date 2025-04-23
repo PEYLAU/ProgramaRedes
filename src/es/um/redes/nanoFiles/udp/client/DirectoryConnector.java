@@ -303,9 +303,9 @@ public class DirectoryConnector {
 		// TODO: Ver TODOs en pingDirectory y seguir esquema similar
 		
 		DirMessage m = new DirMessage(DirMessageOps.OPERATION_SEND_FILES);
-		m.setServerPort(serverPort);
-		m.setFileNum(String.valueOf(files.length));
+		m.setFileNum(files.length);
 		for(FileInfo f : files) {
+			f.fileAddress = new InetSocketAddress(serverPort);
 			m.addFileInfo(f);
 		}
 		
@@ -335,9 +335,24 @@ public class DirectoryConnector {
 	public FileInfo[] getFileList() {
 		FileInfo[] filelist = new FileInfo[0];
 		// TODO: Ver TODOs en pingDirectory y seguir esquema similar
-
-
-
+		
+		DirMessage m = new DirMessage(DirMessageOps.OPERATION_REQUEST_FILELIST);
+		String mensaje = m.toString();
+		byte[] buffer = mensaje.getBytes();
+		byte[] buffrespuesta = sendAndReceiveDatagrams(buffer);
+		if(buffrespuesta != null) {
+			String buffrespuestaString = new String(buffrespuesta, 0, buffrespuesta.length);
+			DirMessage messageResponse = DirMessage.fromString(buffrespuestaString);
+			if(messageResponse != null && messageResponse.getOperation().startsWith(DirMessageOps.OPERATION_SEND_FILES)) {
+				int size = messageResponse.getFileNum();
+				filelist = new FileInfo[size];
+				for(int i = 0; i < size; i++) {
+					filelist[i] = messageResponse.getFileFromPos(i);
+				}
+				
+			}
+		
+		}
 		return filelist;
 	}
 

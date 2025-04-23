@@ -1,5 +1,6 @@
 package es.um.redes.nanoFiles.udp.message;
 
+import java.net.InetSocketAddress;
 import java.util.LinkedList;
 
 import es.um.redes.nanoFiles.util.FileInfo;
@@ -29,7 +30,8 @@ public class DirMessage {
 	private static final String FIELDNAME_FILE_NAME = "filename";
 	private static final String FIELDNAME_FILE_PATH = "filepath";
 	private static final String FIELDNAME_FILE_SIZE = "filesize";
-	private static final String FIELDNAME_SERVER_PORT = "serverport";
+	private static final String FIELDNAME_FILE_ADDRESS = "fileaddress";
+	private static final String FIELDNAME_FILE_PORT = "fileport";
 	/*
 	 * TODO: (Boletín MensajesASCII) Definir de manera simbólica los nombres de
 	 * todos los campos que pueden aparecer en los mensajes de este protocolo
@@ -46,12 +48,8 @@ public class DirMessage {
 	 * Identificador de protocolo usado, para comprobar compatibilidad del directorio.
 	 */
 	private String protocolId;
-	private String fileNum;
-	private int serverPort;
-	private LinkedList<String> fileHashes = new LinkedList<String>();
-	private LinkedList<String> fileNames = new LinkedList<String>();
-	private LinkedList<String> filePaths = new LinkedList<String>();
-	private LinkedList<Long> fileSizes = new LinkedList<Long>();
+	private int fileNum;
+	private LinkedList<FileInfo> filelist = new LinkedList<FileInfo>();
 	/*
 	 * TODO: (Boletín MensajesASCII) Crear un atributo correspondiente a cada uno de
 	 * los campos de los diferentes mensajes de este protocolo.
@@ -98,11 +96,11 @@ public class DirMessage {
 		return protocolId;
 	}
 	
-	public String getFileNum() {
+	public Integer getFileNum() {
 		return fileNum;
 	}
 	
-	public void setFileNum(String value) {
+	public void setFileNum(int value) {
 		if (!operation.equals(DirMessageOps.OPERATION_SEND_FILES)) {
 			throw new RuntimeException(
 					"DirMessage: setFileNum called for message of unexpected type (" + operation + ")");
@@ -110,27 +108,13 @@ public class DirMessage {
 		fileNum = value;
 	}
 	
-	public int getServerPort() {
-		return serverPort;
-	}
-	
-	public void setServerPort(int sp) {
-		if (!operation.equals(DirMessageOps.OPERATION_SEND_FILES)) {
-			throw new RuntimeException(
-					"DirMessage: setServerPort called for message of unexpected type (" + operation + ")");
-		}
-		this.serverPort = sp;
-	}
 	
 	public void addFileInfo(FileInfo f) {
-		fileHashes.add(f.fileHash);
-		fileNames.add(f.fileName);
-		filePaths.add(f.filePath);
-		fileSizes.add(f.fileSize);
+		filelist.add(f);
 	}
 	
 	public FileInfo getFileFromPos(int i) {
-		return new FileInfo(fileHashes.get(i),fileNames.get(i),fileSizes.get(i), filePaths.get(i));
+		return filelist.get(i);
 	}
 	
 
@@ -163,7 +147,8 @@ public class DirMessage {
 		String currName = null;
 		String currPath = null;
 		String currSize = null;
-
+		String currAddress = null;
+		String currPort = null;
 
 
 		for (String line : lines) {
@@ -184,12 +169,8 @@ public class DirMessage {
 				m.setProtocolID(value);
 				break;
 			}
-			case FIELDNAME_SERVER_PORT:{
-				m.setServerPort(Integer.parseInt(value));
-				break;
-			}
 			case FIELDNAME_FILE_NUM:{
-				m.setFileNum(value);
+				m.setFileNum(Integer.parseInt(value));
 				break;
 			}
 			case FIELDNAME_FILE_HASH:{
@@ -206,7 +187,16 @@ public class DirMessage {
 			}
 			case FIELDNAME_FILE_SIZE:{
 				currSize = value;
+				break;
+			}
+			case FIELDNAME_FILE_ADDRESS:{
+				currAddress = value;
+				break;
+			}
+			case FIELDNAME_FILE_PORT: {
+				currPort = value;
 				f = new FileInfo(currHash, currName, Long.parseLong(currSize), currPath);
+				f.fileAddress = new InetSocketAddress(currAddress, Integer.parseInt(currPort));
 				m.addFileInfo(f);
 				break;
 			}
@@ -251,13 +241,14 @@ public class DirMessage {
 			break;
 		}
 		case DirMessageOps.OPERATION_SEND_FILES:{
-			sb.append(FIELDNAME_SERVER_PORT + DELIMITER + serverPort + END_LINE);
 			sb.append(FIELDNAME_FILE_NUM + DELIMITER + fileNum + END_LINE);
-			for(int i = 0; i < Integer.parseInt(fileNum); i++) {
-				sb.append(FIELDNAME_FILE_HASH + DELIMITER + fileHashes.get(i) + END_LINE);
-				sb.append(FIELDNAME_FILE_NAME + DELIMITER + fileNames.get(i) + END_LINE);
-				sb.append(FIELDNAME_FILE_PATH + DELIMITER + filePaths.get(i) + END_LINE);
-				sb.append(FIELDNAME_FILE_SIZE + DELIMITER + fileSizes.get(i) + END_LINE);
+			for(FileInfo f : filelist) {
+				sb.append(FIELDNAME_FILE_HASH + DELIMITER + f.fileHash + END_LINE);
+				sb.append(FIELDNAME_FILE_NAME + DELIMITER + f.fileName + END_LINE);
+				sb.append(FIELDNAME_FILE_PATH + DELIMITER + f.filePath + END_LINE);
+				sb.append(FIELDNAME_FILE_SIZE + DELIMITER + f.fileSize + END_LINE);
+				sb.append(FIELDNAME_FILE_ADDRESS + DELIMITER + f.fileAddress.getAddress() + END_LINE);
+				sb.append(FIELDNAME_FILE_PORT + DELIMITER + f.fileAddress.getPort() + END_LINE);
 			}
 		}
 		break;
