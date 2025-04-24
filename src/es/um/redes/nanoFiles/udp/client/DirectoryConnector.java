@@ -346,9 +346,7 @@ public class DirectoryConnector {
 			if(messageResponse != null && messageResponse.getOperation().startsWith(DirMessageOps.OPERATION_SEND_FILES)) {
 				int size = messageResponse.getFileNum();
 				filelist = new FileInfo[size];
-				for(int i = 0; i < size; i++) {
-					filelist[i] = messageResponse.getFileFromPos(i);
-				}
+				messageResponse.getFileList().toArray(filelist);
 				
 			}
 		
@@ -370,10 +368,38 @@ public class DirectoryConnector {
 		// TODO: Ver TODOs en pingDirectory y seguir esquema similar
 		InetSocketAddress[] serversList = new InetSocketAddress[0];
 
-
-
+		DirMessage m = new DirMessage(DirMessageOps.OPERATION_REQUEST_SERVER); 
+		m.setFilenameSubstring(filenameSubstring);
+		String mensaje = m.toString();
+		byte[] buffer = mensaje.getBytes();
+		byte[] buffrespuesta = sendAndReceiveDatagrams(buffer);
+		if(buffrespuesta != null) {
+			String buffrespuestaString = new String(buffrespuesta, 0, buffrespuesta.length);
+			DirMessage messageResponse = DirMessage.fromString(buffrespuestaString);
+			if(messageResponse != null) {
+				switch(messageResponse.getOperation()) {
+					case DirMessageOps.OPERATION_SERVER_LIST: {
+						serversList = new InetSocketAddress[messageResponse.getAddressNum()];
+						messageResponse.getAddressList().toArray(serversList);
+						break;
+					}
+					case  DirMessageOps.OPERATION_BAD_NAME: {
+						System.err.println("ERROR, SUBCADENA DEMASIADA AMBIGUA");
+						break;
+					}
+					case  DirMessageOps.OPERATION_NO_NAME: {
+						System.err.println("ERROR, NO EXISTE NINGÚN ARCHIVO CON DICHA SUBCADENA");
+						break;
+					}
+				}
+					
+			}
+			
+		}
 		return serversList;
 	}
+	
+	
 
 	/**
 	 * Método para darse de baja como servidor de ficheros.

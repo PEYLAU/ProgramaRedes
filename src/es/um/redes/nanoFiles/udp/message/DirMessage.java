@@ -1,6 +1,7 @@
 package es.um.redes.nanoFiles.udp.message;
 
 import java.net.InetSocketAddress;
+import java.util.Arrays;
 import java.util.LinkedList;
 
 import es.um.redes.nanoFiles.util.FileInfo;
@@ -32,6 +33,7 @@ public class DirMessage {
 	private static final String FIELDNAME_FILE_SIZE = "filesize";
 	private static final String FIELDNAME_FILE_ADDRESS = "fileaddress";
 	private static final String FIELDNAME_FILE_PORT = "fileport";
+	private static final String FIELDNAME_SUBSTRING = "filenamesubstring";
 	/*
 	 * TODO: (Boletín MensajesASCII) Definir de manera simbólica los nombres de
 	 * todos los campos que pueden aparecer en los mensajes de este protocolo
@@ -50,6 +52,9 @@ public class DirMessage {
 	private String protocolId;
 	private int fileNum;
 	private LinkedList<FileInfo> filelist = new LinkedList<FileInfo>();
+	private String filenameSubstring; 
+	private int addressNum; 
+	private LinkedList<InetSocketAddress> addressList = new LinkedList<InetSocketAddress>(); 
 	/*
 	 * TODO: (Boletín MensajesASCII) Crear un atributo correspondiente a cada uno de
 	 * los campos de los diferentes mensajes de este protocolo.
@@ -96,6 +101,19 @@ public class DirMessage {
 		return protocolId;
 	}
 	
+	public void setFilenameSubstring(String subString) {
+		if (!operation.equals(DirMessageOps.OPERATION_REQUEST_SERVER)) {
+			throw new RuntimeException(
+					"DirMessage: setFilenameSubstring called for message of unexpected type (" + operation + ")");
+		}
+		filenameSubstring = subString; 
+	}
+	
+	public String getFilenameSubstring() {
+
+		return filenameSubstring;
+	}	
+	
 	public Integer getFileNum() {
 		return fileNum;
 	}
@@ -108,15 +126,42 @@ public class DirMessage {
 		fileNum = value;
 	}
 	
+	public Integer getAddressNum() {
+		return addressNum;
+	}
+	
+	public void setAddressNum(int value) {
+		if (!operation.equals(DirMessageOps.OPERATION_SERVER_LIST)) {
+			throw new RuntimeException(
+					"DirMessage: setAddressNum called for message of unexpected type (" + operation + ")");
+		}
+		addressNum = value;
+	}
+	
 	
 	public void addFileInfo(FileInfo f) {
 		filelist.add(f);
 	}
 	
+	public LinkedList<FileInfo> getFileList(){
+		return filelist;
+	}
+	
 	public FileInfo getFileFromPos(int i) {
 		return filelist.get(i);
 	}
+
+	public void addAddress(InetSocketAddress addr) {
+		addressList.add(addr);
+	}
 	
+	public LinkedList<InetSocketAddress> getAddressList(){
+		return addressList;
+	}
+	
+	public InetSocketAddress getAddressFromPos(int i) {
+		return addressList.get(i);
+	}
 
 
 
@@ -200,6 +245,10 @@ public class DirMessage {
 				m.addFileInfo(f);
 				break;
 			}
+			case FIELDNAME_SUBSTRING:{
+				m.setFilenameSubstring(value); 
+				break; 
+			}
 			
 
 
@@ -250,8 +299,14 @@ public class DirMessage {
 				sb.append(FIELDNAME_FILE_ADDRESS + DELIMITER + f.fileAddress.getAddress() + END_LINE);
 				sb.append(FIELDNAME_FILE_PORT + DELIMITER + f.fileAddress.getPort() + END_LINE);
 			}
+			break;
 		}
-		break;
+		
+		case DirMessageOps.OPERATION_REQUEST_SERVER: {
+			sb.append(FIELDNAME_SUBSTRING + DELIMITER + filenameSubstring + END_LINE); 
+			break;
+		}
+		
 		}
 
 

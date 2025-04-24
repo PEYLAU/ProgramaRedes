@@ -144,7 +144,9 @@ public class NFServer extends Thread implements Runnable {
 	 * servidor (stopserver) 3) Obtener el puerto de escucha del servidor etc.
 	 */
 
-
+	public int getServerPort() {
+		return this.serverSocket.getLocalPort();
+	}
 
 
 	/**

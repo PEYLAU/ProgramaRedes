@@ -178,7 +178,7 @@ public class NFControllerLogicP2P {
 		 * TODO: Devolver el puerto de escucha de nuestro servidor de ficheros
 		 */
 
-		port = fileServer.PORT;
+		port = fileServer.getServerPort();
 
 		return port;
 	}

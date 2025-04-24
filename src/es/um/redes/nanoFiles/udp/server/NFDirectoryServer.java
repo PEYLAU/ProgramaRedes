@@ -312,6 +312,41 @@ public class NFDirectoryServer {
 			System.out.println("Message to respond with: " + msgToSend.toString());
 			break;
 		}
+		case DirMessageOps.OPERATION_REQUEST_SERVER:{
+			boolean success = true;
+			String subString = responseMessage.getFilenameSubstring();
+			String trueString = null;
+			for(String s : files.keySet()) {
+				if(s.contains(subString)) {
+					if(trueString == null) {
+						trueString = s;
+					}
+					else {
+						success = false;
+						break;
+					}
+				}
+			}
+			if(trueString == null) {
+				msgToSend = new DirMessage(DirMessageOps.OPERATION_NO_NAME);
+				
+			}
+			else if(!success) {
+				msgToSend = new DirMessage(DirMessageOps.OPERATION_BAD_NAME);
+			}
+			else {
+				msgToSend = new DirMessage(DirMessageOps.OPERATION_SERVER_LIST); 
+				LinkedList<FileInfo> l = files.get(trueString);
+				msgToSend.setAddressNum(l.size());
+				for(FileInfo f : l) {
+					msgToSend.addAddress(f.fileAddress);
+				}
+			}
+			
+			System.out.println("Message to respond with: " + msgToSend.toString());
+			break; 
+		}
+		
 
 
 
