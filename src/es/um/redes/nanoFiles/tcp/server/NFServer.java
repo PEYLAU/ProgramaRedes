@@ -9,8 +9,10 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import es.um.redes.nanoFiles.application.NanoFiles;
 import es.um.redes.nanoFiles.tcp.message.PeerMessage;
 import es.um.redes.nanoFiles.tcp.message.PeerMessageOps;
+import es.um.redes.nanoFiles.util.FileInfo;
 
 
 
@@ -22,7 +24,8 @@ public class NFServer extends Thread implements Runnable {
 
 
 	private ServerSocket serverSocket = null;
-
+	private boolean stop = false;
+	
 	public NFServer() throws IOException {
 		/*
 		 * TODO: (Boletín SocketsTCP) Crear una direción de socket a partir del puerto
@@ -102,7 +105,7 @@ public class NFServer extends Thread implements Runnable {
 		 * TODO: (Boletín SocketsTCP) Usar el socket servidor para esperar conexiones de
 		 * otros peers que soliciten descargar ficheros
 		 */
-		while(true) {
+		while(!stop) {
 			try {
 				Socket socket = serverSocket.accept();
 				
@@ -144,6 +147,11 @@ public class NFServer extends Thread implements Runnable {
 	 * servidor (stopserver) 3) Obtener el puerto de escucha del servidor etc.
 	 */
 
+	
+	public void stopServer() {
+		stop = true;
+	}
+	
 	public int getServerPort() {
 		return this.serverSocket.getLocalPort();
 	}
@@ -165,9 +173,21 @@ public class NFServer extends Thread implements Runnable {
 			DataInputStream dis = new DataInputStream(socket.getInputStream());
 			DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
 			while(true) {
-				PeerMessage messageFromServer = PeerMessage.readMessageFromInputStream(dis);
-				if(messageFromServer.getOpcode() == PeerMessageOps.OPCODE_FILE_INFO) {
-					PeerMessage responseToServer = new PeerMessage(PeerMessageOps.OPCODE_FILE_NOT_FOUND);
+				PeerMessage messageFromClient = PeerMessage.readMessageFromInputStream(dis);
+				if(messageFromClient.getOpcode() == PeerMessageOps.OPCODE_FILE_INFO) {
+					PeerMessage responseToServer = null;
+					boolean found = false;
+					FileInfo file = FileInfo.lookupFilenameSubstring(NanoFiles.db.getFiles(), (String) messageFromClient.getParametro2())[0];
+					
+					if(file == null) {
+						responseToServer = new PeerMessage(PeerMessageOps.OPCODE_FILE_NOT_FOUND);
+					}
+					else {
+						responseToServer = new PeerMessage(PeerMessageOps.OPCODE_CHECK_SIZE_AND_HASH);
+						responseToServer.setParametro1(file.fileSize);
+						responseToServer.setParametro2(file.fileHash);
+					}
+					
 					responseToServer.writeMessageToOutputStream(dos);
 				}
 			}

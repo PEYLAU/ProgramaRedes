@@ -1,6 +1,9 @@
 package es.um.redes.nanoFiles.logic;
 
 import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import es.um.redes.nanoFiles.tcp.client.NFConnector;
 import es.um.redes.nanoFiles.application.NanoFiles;
@@ -145,6 +148,54 @@ public class NFControllerLogicP2P {
 			System.err.println("* Cannot start download - No list of server addresses provided");
 			return false;
 		}
+		try {
+	
+			File f = new File(localFileName);
+			if(f.exists()) {
+				System.err.println("* The file already exists in this machine");
+				return false;
+			}
+		
+			f.createNewFile();
+		
+			FileOutputStream fos = new FileOutputStream(f);
+		
+			NFConnector[] connectors = new NFConnector[serverAddressList.length];
+			for(int i = 0; i < connectors.length; i++) {
+				connectors[i] = new NFConnector(serverAddressList[i]);
+			}
+			
+			String s = null;
+			String currHash = null;
+			for(NFConnector con : connectors) {
+				currHash = con.getFileHash(targetFileNameSubstring);
+				if(s == null) {
+					s = currHash;
+				}
+				else if(s != currHash) {
+					System.err.println("Found different files with same name");
+					return false;
+				}
+			}
+			
+			for(NFConnector con : connectors) {
+				fos.write(con.getFileChunk()));
+			}
+			
+			
+			
+			 
+			
+			
+		}catch(UnknownHostException e) {
+			System.err.println("Host address could not be determined properly");
+
+		}catch (IOException io) {
+			System.err.println("IOException thrown on connector creation");
+		}
+		
+		
+		
 		/*
 		 * TODO: Crear un objeto NFConnector distinto para establecer una conexión TCP
 		 * con cada servidor de ficheros proporcionado, y usar dicho objeto para
@@ -188,6 +239,8 @@ public class NFControllerLogicP2P {
 	 * 
 	 */
 	protected void stopFileServer() {
+		
+		fileServer.stopServer();
 		/*
 		 * TODO: Enviar señal para detener nuestro servidor de ficheros en segundo plano
 		 */
@@ -198,7 +251,8 @@ public class NFControllerLogicP2P {
 
 	protected boolean serving() {
 		boolean result = false;
-
+		
+		result = fileServer.isAlive();
 
 
 		return result;

@@ -105,9 +105,9 @@ public class PeerMessage {
 			message.setParametro1(dis.readLong());
 			message.setParametro2(dis.readUTF());
 			break;
-		case PeerMessageOps.OPCODE_CHECK_HASH:
+		case PeerMessageOps.OPCODE_CHECK_SIZE_AND_HASH:
 			message.setParametro1(dis.readLong());
-			message.setParametro2(dis.readInt());
+			message.setParametro2(dis.readUTF());
 			break; 
 
 		default:
@@ -140,9 +140,9 @@ public class PeerMessage {
 			dos.writeLong(parametro1); 
 			dos.writeUTF((String) parametro2); 
 			break;
-		case PeerMessageOps.OPCODE_CHECK_HASH:
+		case PeerMessageOps.OPCODE_CHECK_SIZE_AND_HASH:
 			dos.writeLong(parametro1); 
-			dos.writeInt((int) parametro2); 
+			dos.writeUTF((String) parametro2); 
 			break; 
 
 
