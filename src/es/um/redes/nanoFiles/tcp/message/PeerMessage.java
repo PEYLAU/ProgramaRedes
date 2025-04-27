@@ -18,16 +18,22 @@ public class PeerMessage {
 
 
 	private byte opcode;
-	private long parametro1;
-	private Object parametro2; 
+
 
 	/*
 	 * TODO: (Boletín MensajesBinarios) Añadir atributos u otros constructores
 	 * específicos para crear mensajes con otros campos, según sea necesario
 	 * 
 	 */
-
-
+	
+	private long position;
+	private long chunkSize; 
+	
+	private String fileName;
+	private long fileSize;
+	private String fileHash;
+	private byte[] fileData;
+	
 
 
 	public PeerMessage() {
@@ -52,24 +58,63 @@ public class PeerMessage {
 		this.opcode = op;
 	}
 	
-	public long getParametro1() {
-		return this.parametro1;
+	
+	
+	public long getPosition() {
+		return this.position;
 	}
-	public Object getParametro2() {
-		return this.parametro2; 
+	public long getChunkSize() {
+		return this.chunkSize; 
 	}
-	public void setParametro1(long p1) {
-		this.parametro1 = p1;
+	public void setPosition(long p1) {
+		this.position = p1;
 	}
 	
-	public void setParametro2(String p2) {
-		this.parametro2 = p2;
+	public void setChunkSize(long p2) {
+		this.chunkSize = p2;
 	}
-	public void setParametro2(int p2) {
-		this.parametro2 = p2;
+	
+	
+	
+	
+	public String getFileName() {
+		return this.fileName;
+	}
+	
+	public void setFileName(String value) {
+		this.fileName = value;
+	}
+	
+	
+	
+
+	public String getFileHash() {
+		return this.fileHash;
+	}
+	
+	public void setFileHash(String value) {
+		this.fileHash = value;
+	}
+	
+	
+	
+	
+	public byte[] getFileData() {
+		return this.fileData;
+	}
+	
+	public void setFileData(byte[] value) {
+		this.fileData = value;
 	}
 
-
+	
+	public long getFileSize() {
+		return this.fileSize;
+	}
+	
+	public void setFileSize(long value) {
+		this.fileSize = value;
+	}
 
 
 
@@ -98,16 +143,16 @@ public class PeerMessage {
 		case PeerMessageOps.OPCODE_FILE_NOT_FOUND:
 			break;
 		case PeerMessageOps.OPCODE_DOWNLOAD_CHUNK: 
-			message.setParametro1(dis.readLong());
-			message.setParametro2(dis.readInt());
+			message.setFileName(dis.readUTF());
+			message.setPosition(dis.readLong());
+			message.setChunkSize(dis.readLong());
+			break;
+		case PeerMessageOps.OPCODE_CHECK_FILE:
+			message.setFileName(dis.readUTF());
 			break;
 		case PeerMessageOps.OPCODE_FILE_INFO:
-			message.setParametro1(dis.readLong());
-			message.setParametro2(dis.readUTF());
-			break;
-		case PeerMessageOps.OPCODE_CHECK_SIZE_AND_HASH:
-			message.setParametro1(dis.readLong());
-			message.setParametro2(dis.readUTF());
+			message.setFileSize(dis.readLong());
+			message.setFileHash(dis.readUTF());
 			break; 
 
 		default:
@@ -133,16 +178,16 @@ public class PeerMessage {
 		case PeerMessageOps.OPCODE_FILE_NOT_FOUND:
 			break;
 		case PeerMessageOps.OPCODE_DOWNLOAD_CHUNK: 
-			dos.writeLong(parametro1); 
-			dos.writeInt((int) parametro2); 
+			dos.writeUTF(fileName);
+			dos.writeLong(position); 
+			dos.writeLong(chunkSize); 
+			break;
+		case PeerMessageOps.OPCODE_CHECK_FILE:
+			dos.writeUTF(fileName);
 			break;
 		case PeerMessageOps.OPCODE_FILE_INFO:
-			dos.writeLong(parametro1); 
-			dos.writeUTF((String) parametro2); 
-			break;
-		case PeerMessageOps.OPCODE_CHECK_SIZE_AND_HASH:
-			dos.writeLong(parametro1); 
-			dos.writeUTF((String) parametro2); 
+			dos.writeLong(fileSize); 
+			dos.writeUTF(fileHash); 
 			break; 
 
 
@@ -158,13 +203,29 @@ public class PeerMessage {
 	public String toString() {
 		String s = "";
 		s += opcode;
-		s += parametro1;
-		s += parametro2;
+		switch (opcode) {
 		
-		return s;
+			case PeerMessageOps.OPCODE_FILE_NOT_FOUND:
+				break;
+			case PeerMessageOps.OPCODE_DOWNLOAD_CHUNK: 
+				s += fileName;
+				s += position; 
+				s += chunkSize; 
+				break;
+			case PeerMessageOps.OPCODE_CHECK_FILE:
+				s += fileName;
+				break;
+			case PeerMessageOps.OPCODE_FILE_INFO:
+				s += fileSize; 
+				s += fileHash; 
+			break;
+			
+			}
 		
-	}
+		
+			return s;
+		}
 
-
+		
 
 }

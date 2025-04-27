@@ -367,6 +367,7 @@ public class DirectoryConnector {
 	public InetSocketAddress[] getServersSharingThisFile(String filenameSubstring) {
 		// TODO: Ver TODOs en pingDirectory y seguir esquema similar
 		InetSocketAddress[] serversList = new InetSocketAddress[0];
+		System.out.println("haciendo esto");
 
 		DirMessage m = new DirMessage(DirMessageOps.OPERATION_REQUEST_SERVER); 
 		m.setFilenameSubstring(filenameSubstring);
@@ -379,6 +380,7 @@ public class DirectoryConnector {
 			if(messageResponse != null) {
 				switch(messageResponse.getOperation()) {
 					case DirMessageOps.OPERATION_SERVER_LIST: {
+						System.out.println(messageResponse.toString());
 						serversList = new InetSocketAddress[messageResponse.getAddressNum()];
 						messageResponse.getAddressList().toArray(serversList);
 						break;

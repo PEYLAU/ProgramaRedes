@@ -83,6 +83,7 @@ public class NFControllerLogicP2P {
 
 	}
 
+	
 	protected void testTCPServer() {
 		assert (NanoFiles.testModeTCP);
 		/*
@@ -109,7 +110,8 @@ public class NFControllerLogicP2P {
 			fileServer = null;
 		}
 	}
-
+	
+	
 	public void testTCPClient() {
 
 		assert (NanoFiles.testModeTCP);
@@ -130,7 +132,8 @@ public class NFControllerLogicP2P {
 			e.printStackTrace();
 		}
 	}
-
+	 
+	
 	/**
 	 * Método para descargar un fichero del peer servidor de ficheros
 	 * 
@@ -167,8 +170,10 @@ public class NFControllerLogicP2P {
 			
 			String s = null;
 			String currHash = null;
+			long currSize = -1;
 			for(NFConnector con : connectors) {
 				currHash = con.getFileHash(targetFileNameSubstring);
+				currSize = con.getFileSize(targetFileNameSubstring);
 				if(s == null) {
 					s = currHash;
 				}
@@ -178,8 +183,9 @@ public class NFControllerLogicP2P {
 				}
 			}
 			
+			int i = 0;
 			for(NFConnector con : connectors) {
-				fos.write(con.getFileChunk()));
+				fos.write(con.getFileChunk(targetFileNameSubstring, connectors.length, i));
 			}
 			
 			

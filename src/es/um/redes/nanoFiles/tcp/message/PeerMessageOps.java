@@ -7,10 +7,11 @@ public class PeerMessageOps {
 
 	public static final byte OPCODE_INVALID_CODE = 0;
 	public static final byte OPCODE_FILE_NOT_FOUND = 1;
-	public static final byte OPCODE_DOWNLOAD_CHUNK = 2;
+	public static final byte OPCODE_CHECK_FILE = 2;
 	public static final byte OPCODE_FILE_INFO = 3;
-	public static final byte OPCODE_CHECK_SIZE_AND_HASH = 4;
+	public static final byte OPCODE_DOWNLOAD_CHUNK = 4;
 	public static final byte OPCODE_CHUNK_DOWNLOADED = 5;
+	
 
 	/*
 	 * TODO: (Boletín MensajesBinarios) Añadir aquí todas las constantes que definen
@@ -26,11 +27,11 @@ public class PeerMessageOps {
 	 * su representación textual a "valid_operations_str" EN EL MISMO ORDEN.
 	 */
 	private static final Byte[] _valid_opcodes = { OPCODE_INVALID_CODE, OPCODE_FILE_NOT_FOUND, OPCODE_DOWNLOAD_CHUNK,
-			OPCODE_FILE_INFO, OPCODE_CHECK_SIZE_AND_HASH, OPCODE_CHUNK_DOWNLOADED
+			OPCODE_FILE_INFO, OPCODE_CHECK_FILE, OPCODE_CHUNK_DOWNLOADED
 			
 	};
 	private static final String[] _valid_operations_str = { "INVALID_OPCODE", "FILE_NOT_FOUND", "DOWNLOAD_CHUNK",
-			"FILE_INFO", "CHECK_SIZE_AND_HASH", "CHUNK_DOWNLOADED"
+			"FILE_INFO", "CHECK_FILE", "CHUNK_DOWNLOADED"
 
 
 

@@ -21,7 +21,7 @@ public class NFConnector {
 	private DataInputStream dis;
 	private DataOutputStream dos;
 	
-	private long fileSize = null;
+	private long fileSize = -1;
 	private String fileHash = null;
 
 
@@ -61,7 +61,7 @@ public class NFConnector {
 		/*
 		 * TODO: (Boletín SocketsTCP) Enviar entero cualquiera a través del socket y
 		 * después recibir otro entero, comprobando que se trata del mismo valor.
-		 */
+		 
 		
 		try {
 			PeerMessage message = new PeerMessage(PeerMessageOps.OPCODE_FILE_INFO);
@@ -74,47 +74,74 @@ public class NFConnector {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		*/
+	}
+	
+	
+	public boolean getFileInfo(String fileName) {
+		try {
+			PeerMessage message = new PeerMessage(PeerMessageOps.OPCODE_FILE_INFO);
+			message.setFileName(fileName);
+			message.writeMessageToOutputStream(dos);
+			PeerMessage respuesta = PeerMessage.readMessageFromInputStream(dis);
+			if(respuesta.getOpcode() == PeerMessageOps.OPCODE_FILE_NOT_FOUND) {
+				System.err.println("File could not be found when checking size/hash");
+				return false;
+			}
+			this.fileSize = respuesta.getFileSize();
+			this.fileHash = (String) respuesta.getFileHash();
+		}catch(IOException e) {
+			System.err.println("IOException when asking for fileInfo");
+			return false;
+		}
+		
+		return true;
 	}
 
 	
 	public String getFileHash(String fileName) {
-		try {
-			PeerMessage message = new PeerMessage(PeerMessageOps.OPCODE_FILE_INFO);
-			message.setParametro1(fileName.length());
-			message.setParametro2(fileName);
-			message.writeMessageToOutputStream(dos);
-			PeerMessage respuesta = PeerMessage.readMessageFromInputStream(dis);
-			if(respuesta.getOpcode() == PeerMessageOps.OPCODE_FILE_NOT_FOUND) {
-				System.err.println("File could not be found when checking size and hash");
+		if(this.fileHash == null) {
+			boolean success = getFileInfo(fileName);
+			if(!success) {
+				System.err.println("Could not obtain Hash");
 				return null;
 			}
-			this.fileSize = respuesta.getParametro1();
-			this.fileHash = (String) respuesta.getParametro2();
-		}catch(IOException e) {
-			System.err.println("IOException when asking for fileHash");
-			return null;
 		}
 		
 		
 		return this.fileHash;
 	}
 	
+	public long getFileSize(String fileName) {
+		if(this.fileSize == -1) {
+			boolean success = getFileInfo(fileName);
+			if(!success) {
+				System.err.println("Could not obtain Size");
+				return -1;
+			}
+		}
+		
+		return this.fileSize;
+	}
 	
 	public byte[] getFileChunk(String fileName, int conNum, int currDiv) {
 		try {
 			PeerMessage message = new PeerMessage(PeerMessageOps.OPCODE_DOWNLOAD_CHUNK);
+			
 			long inPos = this.fileSize * (currDiv/conNum);
-			int tam = this.fileSize/conNum;
-			message.setParametro1(inPos);
-			message.setParametro2(tam);
+			long tam = this.fileSize/conNum;
+			
+			message.setFileName(fileName);
+			message.setPosition(inPos);
+			message.setChunkSize(tam);
+			
 			message.writeMessageToOutputStream(dos);
 			PeerMessage respuesta = PeerMessage.readMessageFromInputStream(dis);
 			if(respuesta.getOpcode() == PeerMessageOps.OPCODE_FILE_NOT_FOUND) {
 				System.err.println("File could not be found when checking size and hash");
 				return null;
 			}
-			this.fileSize = respuesta.getParametro1();
-			this.fileHash = (String) respuesta.getParametro2();
+			return respuesta.getFileData();
 		}catch(IOException e) {
 			System.err.println("IOException when asking for fileHash");
 			return null;

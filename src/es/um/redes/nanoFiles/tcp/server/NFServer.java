@@ -4,7 +4,11 @@ import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -12,6 +16,8 @@ import java.net.Socket;
 import es.um.redes.nanoFiles.application.NanoFiles;
 import es.um.redes.nanoFiles.tcp.message.PeerMessage;
 import es.um.redes.nanoFiles.tcp.message.PeerMessageOps;
+import es.um.redes.nanoFiles.util.FileDatabase;
+import es.um.redes.nanoFiles.util.FileDigest;
 import es.um.redes.nanoFiles.util.FileInfo;
 
 
@@ -112,13 +118,15 @@ public class NFServer extends Thread implements Runnable {
 				NFServerThread serverThread = new NFServerThread(socket);
 				serverThread.start();
 				
+				if(stop) {
+					serverSocket.close();
+				}
+				
 				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
-			
-			
+			}	
 		}
 		
 		
@@ -172,26 +180,64 @@ public class NFServer extends Thread implements Runnable {
 		try {
 			DataInputStream dis = new DataInputStream(socket.getInputStream());
 			DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+			PeerMessage responseToServer = null;
 			while(true) {
 				PeerMessage messageFromClient = PeerMessage.readMessageFromInputStream(dis);
-				if(messageFromClient.getOpcode() == PeerMessageOps.OPCODE_FILE_INFO) {
-					PeerMessage responseToServer = null;
-					boolean found = false;
-					FileInfo file = FileInfo.lookupFilenameSubstring(NanoFiles.db.getFiles(), (String) messageFromClient.getParametro2())[0];
+				switch(messageFromClient.getOpcode()) {
+					case(PeerMessageOps.OPCODE_CHECK_FILE): {
+						
+						
+
+						FileInfo file = FileInfo.lookupFilenameSubstring(NanoFiles.db.getFiles(), (String) messageFromClient.getFileName())[0];
 					
-					if(file == null) {
-						responseToServer = new PeerMessage(PeerMessageOps.OPCODE_FILE_NOT_FOUND);
-					}
-					else {
-						responseToServer = new PeerMessage(PeerMessageOps.OPCODE_CHECK_SIZE_AND_HASH);
-						responseToServer.setParametro1(file.fileSize);
-						responseToServer.setParametro2(file.fileHash);
-					}
+						if(file == null) {
+							responseToServer = new PeerMessage(PeerMessageOps.OPCODE_FILE_NOT_FOUND);
+						}
+						else {
+							responseToServer = new PeerMessage(PeerMessageOps.OPCODE_FILE_INFO);
+							responseToServer.setFileSize(file.fileSize);
+							responseToServer.setFileHash(file.fileHash);
+						}
 					
-					responseToServer.writeMessageToOutputStream(dos);
+						break;
+					}
+					case(PeerMessageOps.OPCODE_DOWNLOAD_CHUNK):{
+						FileInfo file = FileInfo.lookupFilenameSubstring(NanoFiles.db.getFiles(), (String) messageFromClient.getFileName())[0];
+						
+						long pos = messageFromClient.getPosition();
+						long size = messageFromClient.getChunkSize();
+						
+						File f = new File(NanoFiles.db.lookupFilePath(file.fileHash));
+						if(!f.exists()) {
+							responseToServer = new PeerMessage(PeerMessageOps.OPCODE_FILE_NOT_FOUND);
+						}
+						else {
+							RandomAccessFile archivo = new RandomAccessFile(f, "r");
+							archivo.seek(pos);
+							
+							byte[] datos = new byte[(int) size];
+							
+							archivo.readFully(datos);
+							
+							archivo.close();
+							
+							responseToServer = new PeerMessage(PeerMessageOps.OPCODE_CHUNK_DOWNLOADED);
+							responseToServer.setFileData(datos);
+						}
+						
+						
+						break;
+					}
+				
+				
 				}
+				responseToServer.writeMessageToOutputStream(dos);
+				
 			}
-		}catch(IOException e) {
+		}catch(FileNotFoundException f){
+			System.err.println("Error, file doesn't exist");
+		}
+		catch(IOException e) {
 			e.printStackTrace();
 		}
 		/*

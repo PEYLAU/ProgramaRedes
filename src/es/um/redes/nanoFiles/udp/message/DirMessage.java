@@ -61,6 +61,9 @@ public class DirMessage {
 	 */
 
 
+	public DirMessage() {
+		operation = DirMessageOps.OPERATION_INVALID;
+	}
 
 
 	public DirMessage(String op) {

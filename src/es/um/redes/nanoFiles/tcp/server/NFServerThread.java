@@ -24,8 +24,8 @@ public class NFServerThread extends Thread {
 	}
 	
 	public void run() {
-		boolean terminate = false;
-		while(!terminate) {
+		
+		while(socket.isConnected()) {
 			NFServer.serveFilesToClient(socket);
 		}
 
