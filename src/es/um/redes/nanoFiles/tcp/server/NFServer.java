@@ -197,6 +197,8 @@ public class NFServer extends Thread implements Runnable {
 							responseToServer = new PeerMessage(PeerMessageOps.OPCODE_FILE_INFO);
 							responseToServer.setFileSize(file.fileSize);
 							responseToServer.setFileHash(file.fileHash);
+							responseToServer.setFileName(file.fileName);
+							
 						}
 					
 						break;
@@ -207,15 +209,19 @@ public class NFServer extends Thread implements Runnable {
 						long pos = messageFromClient.getPosition();
 						long size = messageFromClient.getChunkSize();
 						
+						System.out.println(messageFromClient.toString());
+						
 						File f = new File(NanoFiles.db.lookupFilePath(file.fileHash));
 						if(!f.exists()) {
 							responseToServer = new PeerMessage(PeerMessageOps.OPCODE_FILE_NOT_FOUND);
 						}
 						else {
+							
 							RandomAccessFile archivo = new RandomAccessFile(f, "r");
 							archivo.seek(pos);
 							
 							byte[] datos = new byte[(int) size];
+							
 							
 							archivo.readFully(datos);
 							
@@ -223,6 +229,7 @@ public class NFServer extends Thread implements Runnable {
 							
 							responseToServer = new PeerMessage(PeerMessageOps.OPCODE_CHUNK_DOWNLOADED);
 							responseToServer.setFileData(datos);
+							responseToServer.setChunkSize(size);
 						}
 						
 						
@@ -231,6 +238,8 @@ public class NFServer extends Thread implements Runnable {
 				
 				
 				}
+				
+				System.out.println(responseToServer.toString());
 				responseToServer.writeMessageToOutputStream(dos);
 				
 			}

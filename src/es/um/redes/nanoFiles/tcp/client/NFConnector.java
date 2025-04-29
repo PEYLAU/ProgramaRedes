@@ -23,6 +23,7 @@ public class NFConnector {
 	
 	private long fileSize = -1;
 	private String fileHash = null;
+	private String trueFileName = null;
 
 
 
@@ -39,8 +40,7 @@ public class NFConnector {
 		 */
 		
 		
-		socket = new Socket();
-		socket.bind(serverAddr);
+		socket = new Socket(serverAddr.getAddress(), serverAddr.getPort());
 		/*
 		 * TODO: (Boletín SocketsTCP) Se crean los DataInputStream/DataOutputStream a
 		 * partir de los streams de entrada/salida del socket creado. Se usarán para
@@ -81,7 +81,7 @@ public class NFConnector {
 	
 	public boolean getFileInfo(String fileName) {
 		try {
-			PeerMessage message = new PeerMessage(PeerMessageOps.OPCODE_FILE_INFO);
+			PeerMessage message = new PeerMessage(PeerMessageOps.OPCODE_CHECK_FILE);
 			message.setFileName(fileName);
 			message.writeMessageToOutputStream(dos);
 			PeerMessage respuesta = PeerMessage.readMessageFromInputStream(dis);
@@ -90,7 +90,8 @@ public class NFConnector {
 				return false;
 			}
 			this.fileSize = respuesta.getFileSize();
-			this.fileHash = (String) respuesta.getFileHash();
+			this.fileHash = respuesta.getFileHash();
+			this.trueFileName = respuesta.getFileName();
 		}catch(IOException e) {
 			System.err.println("IOException when asking for fileInfo");
 			return false;
@@ -125,6 +126,18 @@ public class NFConnector {
 		return this.fileSize;
 	}
 	
+	public String getFileTrueName(String fileName) {
+		if(this.fileSize == -1) {
+			boolean success = getFileInfo(fileName);
+			if(!success) {
+				System.err.println("Could not obtain Size");
+				return null;
+			}
+		}
+		
+		return this.trueFileName;
+	}
+	
 	public byte[] getFileChunk(String fileName, int conNum, int currDiv) {
 		try {
 			PeerMessage message = new PeerMessage(PeerMessageOps.OPCODE_DOWNLOAD_CHUNK);
@@ -135,13 +148,15 @@ public class NFConnector {
 			message.setFileName(fileName);
 			message.setPosition(inPos);
 			message.setChunkSize(tam);
-			
+			System.out.println("Downloading " + tam + " bytes from file " + fileName + " in position " + inPos);
 			message.writeMessageToOutputStream(dos);
 			PeerMessage respuesta = PeerMessage.readMessageFromInputStream(dis);
+			System.out.println("holla stoy");
 			if(respuesta.getOpcode() == PeerMessageOps.OPCODE_FILE_NOT_FOUND) {
 				System.err.println("File could not be found when checking size and hash");
 				return null;
 			}
+			System.out.println(respuesta.toString());
 			return respuesta.getFileData();
 		}catch(IOException e) {
 			System.err.println("IOException when asking for fileHash");

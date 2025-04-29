@@ -170,10 +170,13 @@ public class NFControllerLogicP2P {
 			
 			String s = null;
 			String currHash = null;
+			String truename = null;
 			long currSize = -1;
+			
 			for(NFConnector con : connectors) {
 				currHash = con.getFileHash(targetFileNameSubstring);
 				currSize = con.getFileSize(targetFileNameSubstring);
+				truename = con.getFileTrueName(targetFileNameSubstring);
 				if(s == null) {
 					s = currHash;
 				}
@@ -184,12 +187,14 @@ public class NFControllerLogicP2P {
 			}
 			
 			f.createNewFile();
-			
+		
 			FileOutputStream fos = new FileOutputStream(f);
 			
 			int i = 0;
 			for(NFConnector con : connectors) {
-				fos.write(con.getFileChunk(targetFileNameSubstring, connectors.length, i));
+				fos.write(con.getFileChunk(truename, connectors.length, i));
+				System.out.println("vamos por el " + i);
+				i++;
 			}
 			
 			

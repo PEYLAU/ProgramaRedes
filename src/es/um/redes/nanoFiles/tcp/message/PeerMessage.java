@@ -29,9 +29,9 @@ public class PeerMessage {
 	private long position;
 	private long chunkSize; 
 	
-	private String fileName;
+	private String fileName = "";
 	private long fileSize;
-	private String fileHash;
+	private String fileHash = "";
 	private byte[] fileData;
 	
 
@@ -79,6 +79,7 @@ public class PeerMessage {
 	
 	public String getFileName() {
 		return this.fileName;
+		
 	}
 	
 	public void setFileName(String value) {
@@ -136,11 +137,12 @@ public class PeerMessage {
 		 * Usar dis.readFully para leer un array de bytes, dis.readInt para leer un
 		 * entero, etc.
 		 */
-		PeerMessage message = new PeerMessage();
+		
 		byte opcode = dis.readByte();
-		message.setOpcode(opcode);
+		PeerMessage message = new PeerMessage(opcode);
 		switch (opcode) {
 		case PeerMessageOps.OPCODE_FILE_NOT_FOUND:
+		case PeerMessageOps.OPCODE_INVALID_CODE:
 			break;
 		case PeerMessageOps.OPCODE_DOWNLOAD_CHUNK: 
 			message.setFileName(dis.readUTF());
@@ -153,7 +155,11 @@ public class PeerMessage {
 		case PeerMessageOps.OPCODE_FILE_INFO:
 			message.setFileSize(dis.readLong());
 			message.setFileHash(dis.readUTF());
+			message.setFileName(dis.readUTF());
 			break; 
+		case PeerMessageOps.OPCODE_CHUNK_DOWNLOADED:
+			message.setChunkSize(dis.readLong());
+			message.setFileData(dis.readNBytes(message.getChunkSize());
 
 		default:
 			System.err.println("PeerMessage.readMessageFromInputStream doesn't know how to parse this message opcode: "
@@ -176,6 +182,7 @@ public class PeerMessage {
 		switch (opcode) {
 		
 		case PeerMessageOps.OPCODE_FILE_NOT_FOUND:
+		case PeerMessageOps.OPCODE_INVALID_CODE:
 			break;
 		case PeerMessageOps.OPCODE_DOWNLOAD_CHUNK: 
 			dos.writeUTF(fileName);
@@ -187,9 +194,12 @@ public class PeerMessage {
 			break;
 		case PeerMessageOps.OPCODE_FILE_INFO:
 			dos.writeLong(fileSize); 
-			dos.writeUTF(fileHash); 
+			dos.writeUTF(fileHash);
+			dos.writeUTF(fileName);
 			break; 
-
+		case PeerMessageOps.OPCODE_CHUNK_DOWNLOADED:
+			dos.write(fileData);
+			break;
 
 
 
@@ -204,7 +214,6 @@ public class PeerMessage {
 		String s = "";
 		s += opcode;
 		switch (opcode) {
-		
 			case PeerMessageOps.OPCODE_FILE_NOT_FOUND:
 				break;
 			case PeerMessageOps.OPCODE_DOWNLOAD_CHUNK: 
@@ -219,7 +228,9 @@ public class PeerMessage {
 				s += fileSize; 
 				s += fileHash; 
 			break;
-			
+			case PeerMessageOps.OPCODE_CHUNK_DOWNLOADED:
+				s += fileData;
+			break;
 			}
 		
 		
