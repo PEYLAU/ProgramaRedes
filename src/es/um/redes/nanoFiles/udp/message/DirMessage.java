@@ -33,6 +33,9 @@ public class DirMessage {
 	private static final String FIELDNAME_FILE_SIZE = "filesize";
 	private static final String FIELDNAME_FILE_ADDRESS = "fileaddress";
 	private static final String FIELDNAME_FILE_PORT = "fileport";
+	private static final String FIELDNAME_ADDRESS_NUM = "addressnum";
+	private static final String FIELDNAME_IPADDRESS = "ipaddress";
+	private static final String FIELDNAME_PORT = "port";
 	private static final String FIELDNAME_SUBSTRING = "filenamesubstring";
 	/*
 	 * TODO: (Boletín MensajesASCII) Definir de manera simbólica los nombres de
@@ -244,13 +247,26 @@ public class DirMessage {
 			case FIELDNAME_FILE_PORT: {
 				currPort = value;
 				f = new FileInfo(currHash, currName, Long.parseLong(currSize), currPath);
-				f.fileAddress = new InetSocketAddress(currAddress, Integer.parseInt(currPort));
+				f.fileAddress.add(new InetSocketAddress(currAddress.substring(1), Integer.parseInt(currPort)));
 				m.addFileInfo(f);
 				break;
 			}
 			case FIELDNAME_SUBSTRING:{
 				m.setFilenameSubstring(value); 
 				break; 
+			}
+			case FIELDNAME_ADDRESS_NUM: {
+				m.setAddressNum(Integer.parseInt(value));
+				break;
+			}
+			case FIELDNAME_IPADDRESS: {
+				currAddress = value;
+				break;
+			}
+			case FIELDNAME_PORT: {
+				currPort = value;
+				m.addAddress(new InetSocketAddress(currAddress.substring(1), Integer.parseInt(currPort)));
+				break;
 			}
 			
 
@@ -299,14 +315,27 @@ public class DirMessage {
 				sb.append(FIELDNAME_FILE_NAME + DELIMITER + f.fileName + END_LINE);
 				sb.append(FIELDNAME_FILE_PATH + DELIMITER + f.filePath + END_LINE);
 				sb.append(FIELDNAME_FILE_SIZE + DELIMITER + f.fileSize + END_LINE);
-				sb.append(FIELDNAME_FILE_ADDRESS + DELIMITER + f.fileAddress.getAddress() + END_LINE);
-				sb.append(FIELDNAME_FILE_PORT + DELIMITER + f.fileAddress.getPort() + END_LINE);
+				for(InetSocketAddress addr : f.fileAddress) {
+					sb.append(FIELDNAME_FILE_ADDRESS + DELIMITER + addr.getAddress() + END_LINE);
+					sb.append(FIELDNAME_FILE_PORT + DELIMITER + addr.getPort() + END_LINE);
+				}
+				
 			}
 			break;
 		}
 		
 		case DirMessageOps.OPERATION_REQUEST_SERVER: {
 			sb.append(FIELDNAME_SUBSTRING + DELIMITER + filenameSubstring + END_LINE); 
+			break;
+		}
+		
+		case DirMessageOps.OPERATION_SERVER_LIST: {
+			sb.append(FIELDNAME_ADDRESS_NUM + DELIMITER + addressNum + END_LINE);
+			for(InetSocketAddress addr : addressList) {
+				sb.append(FIELDNAME_IPADDRESS + DELIMITER + addr.getAddress() + END_LINE);
+				sb.append(FIELDNAME_PORT + DELIMITER + addr.getPort() + END_LINE);
+			}
+			
 			break;
 		}
 		

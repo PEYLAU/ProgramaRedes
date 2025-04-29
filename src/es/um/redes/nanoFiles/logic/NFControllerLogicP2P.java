@@ -47,7 +47,7 @@ public class NFControllerLogicP2P {
 			try {
 				fileServer = new NFServer();
 				fileServer.start();
-				int puerto = fileServer.PORT;
+				int puerto = fileServer.getServerPort();
 				if(puerto <= 0) {
 					System.err.println("Puerto no válido");
 				}
@@ -59,7 +59,7 @@ public class NFControllerLogicP2P {
 				
 				
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				System.err.println("Error al crear servidor de ficheros");
 				e.printStackTrace();
 			}
 			
@@ -154,14 +154,14 @@ public class NFControllerLogicP2P {
 		try {
 	
 			File f = new File(localFileName);
+			/*
+			 * ESTO ES PARA PROBAR LUEGO HAY QUE QUITAR EL COMENTARIO
 			if(f.exists()) {
 				System.err.println("* The file already exists in this machine");
 				return false;
 			}
-		
-			f.createNewFile();
-		
-			FileOutputStream fos = new FileOutputStream(f);
+			*/
+			
 		
 			NFConnector[] connectors = new NFConnector[serverAddressList.length];
 			for(int i = 0; i < connectors.length; i++) {
@@ -183,6 +183,10 @@ public class NFControllerLogicP2P {
 				}
 			}
 			
+			f.createNewFile();
+			
+			FileOutputStream fos = new FileOutputStream(f);
+			
 			int i = 0;
 			for(NFConnector con : connectors) {
 				fos.write(con.getFileChunk(targetFileNameSubstring, connectors.length, i));
@@ -198,6 +202,7 @@ public class NFControllerLogicP2P {
 
 		}catch (IOException io) {
 			System.err.println("IOException thrown on connector creation");
+			io.printStackTrace();
 		}
 		
 		

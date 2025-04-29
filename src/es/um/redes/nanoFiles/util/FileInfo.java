@@ -3,8 +3,11 @@ package es.um.redes.nanoFiles.util;
 import java.io.File;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Vector;
 
 import es.um.redes.nanoFiles.shell.NFShell;
@@ -20,7 +23,7 @@ public class FileInfo {
 	public String fileName;
 	public String filePath;
 	public long fileSize = -1;
-	public InetSocketAddress fileAddress;
+	public HashSet<InetSocketAddress> fileAddress = new HashSet<InetSocketAddress>();
 	
 
 	public FileInfo(String hash, String name, long size, String path) {
@@ -40,6 +43,11 @@ public class FileInfo {
 		strBuf.append(String.format("%1$-30s", fileName));
 		strBuf.append(String.format("%1$10s", fileSize));
 		strBuf.append(String.format(" %1$-45s", fileHash));
+		
+		for(InetSocketAddress addr : fileAddress) {
+			strBuf.append(String.format(" %1$-10s",addr));
+		}
+		
 		return strBuf.toString();
 	}
 
@@ -48,6 +56,7 @@ public class FileInfo {
 		strBuf.append(String.format("%1$-30s", "Name"));
 		strBuf.append(String.format("%1$10s", "Size"));
 		strBuf.append(String.format(" %1$-45s", "Hash"));
+		strBuf.append(String.format(" %1$-10s", "Addresses"));
 		System.out.println(strBuf);
 		for (FileInfo file : files) {
 			System.out.println(file);
@@ -132,4 +141,22 @@ public class FileInfo {
 		matchingFiles.toArray(result);
 		return result;
 	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		FileInfo other = (FileInfo) obj;
+		
+		return fileHash.equals(other.fileHash) && fileName.equals(other.fileName) &&
+				filePath.equals(other.filePath) && fileSize == other.fileSize;
+	}
 }
+
+
+

@@ -6,6 +6,7 @@ import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -287,7 +288,13 @@ public class NFDirectoryServer {
 				if(!files.containsKey(f.fileName)) {
 					files.put(f.fileName, new LinkedList<FileInfo>());	
 				}
-				files.get(f.fileName).add(f);
+				if(files.get(f.fileName).contains(f)) {
+					files.get(f.fileName).get(files.get(f.fileName).indexOf(f)).fileAddress.addAll(f.fileAddress);
+				}
+				else {
+					files.get(f.fileName).add(f);
+				}
+				
 				
 			}
 			
@@ -303,8 +310,6 @@ public class NFDirectoryServer {
 			for(LinkedList<FileInfo> l : files.values()) {
 				size += l.size();
 				for(FileInfo f : l) {
-					int port = f.fileAddress.getPort();
-					f.fileAddress = new InetSocketAddress(pkt.getAddress(), port);
 					msgToSend.addFileInfo(f);
 				}
 			}
@@ -316,6 +321,7 @@ public class NFDirectoryServer {
 			boolean success = true;
 			String subString = responseMessage.getFilenameSubstring();
 			String trueString = null;
+			
 			for(String s : files.keySet()) {
 				if(s.contains(subString)) {
 					if(trueString == null) {
@@ -339,7 +345,10 @@ public class NFDirectoryServer {
 				LinkedList<FileInfo> l = files.get(trueString);
 				msgToSend.setAddressNum(l.size());
 				for(FileInfo f : l) {
-					msgToSend.addAddress(f.fileAddress);
+					for(InetSocketAddress addr : f.fileAddress) {
+						msgToSend.addAddress(addr);
+					}
+					
 				}
 			}
 			

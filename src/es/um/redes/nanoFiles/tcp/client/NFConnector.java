@@ -38,6 +38,7 @@ public class NFConnector {
 		 * conexión TCP ha sido establecida.
 		 */
 		
+		
 		socket = new Socket();
 		socket.bind(serverAddr);
 		/*
