@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--Created with JFLAP 6.4.--><structure>
+	<type>fa</type>
+	<automaton>
+		<!--The list of states.-->
+		<state id="0" name="q0">
+			<x>34.0</x>
+			<y>102.0</y>
+			<label>ONLINE</label>
+		</state>
+		<state id="1" name="q1">
+			<x>231.0</x>
+			<y>96.0</y>
+			<label>SERVING</label>
+		</state>
+		<state id="2" name="q2">
+			<x>496.0</x>
+			<y>38.0</y>
+			<label>checking_file</label>
+		</state>
+		<state id="3" name="q3">
+			<x>436.0</x>
+			<y>228.0</y>
+			<label>add_new_file</label>
+		</state>
+		<!--The list of transitions.-->
+		<transition>
+			<from>1</from>
+			<to>2</to>
+			<read>rcv(downloadFile)</read>
+		</transition>
+		<transition>
+			<from>1</from>
+			<to>3</to>
+			<read>rcv(uploadFile)</read>
+		</transition>
+		<transition>
+			<from>2</from>
+			<to>1</to>
+			<read>snd(name_not_found)</read>
+		</transition>
+		<transition>
+			<from>0</from>
+			<to>1</to>
+			<read>snd(serve)</read>
+		</transition>
+		<transition>
+			<from>2</from>
+			<to>1</to>
+			<read>snd(File) &amp;&amp; snd(FileHash)</read>
+		</transition>
+		<transition>
+			<from>3</from>
+			<to>1</to>
+			<read>add_file_metadata</read>
+		</transition>
+		<transition>
+			<from>1</from>
+			<to>0</to>
+			<read>rcv(directoryNotFound)</read>
+		</transition>
+	</automaton>
+</structure>

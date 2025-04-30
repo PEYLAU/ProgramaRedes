@@ -190,10 +190,31 @@ public class NFControllerLogicP2P {
 		
 			FileOutputStream fos = new FileOutputStream(f);
 			
+			long totalRead = currSize;
+			long inPos = 0;
 			int i = 0;
-			for(NFConnector con : connectors) {
-				fos.write(con.getFileChunk(truename, connectors.length, i));
-				System.out.println("vamos por el " + i);
+			
+			while(totalRead > 0) {
+				i = i % connectors.length;
+				NFConnector con = connectors[i];
+				
+				
+				long tam = currSize/connectors.length;
+				int chunkSize = 0; 
+				if(tam > Integer.MAX_VALUE) {
+					chunkSize = Integer.MAX_VALUE;
+				}
+				else if(totalRead <= Integer.MAX_VALUE && tam <= Integer.MAX_VALUE){
+					chunkSize = Integer.min((int) totalRead, (int) tam);
+				}
+				else {
+					chunkSize = (int) tam;
+				}
+				
+				byte[] data = con.getFileChunk(truename, inPos, chunkSize);
+				fos.write(data);
+				inPos += chunkSize;
+				totalRead += chunkSize;
 				i++;
 			}
 			

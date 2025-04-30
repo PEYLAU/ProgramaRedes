@@ -27,7 +27,7 @@ public class PeerMessage {
 	 */
 	
 	private long position;
-	private long chunkSize; 
+	private int chunkSize; 
 	
 	private String fileName = "";
 	private long fileSize;
@@ -63,14 +63,14 @@ public class PeerMessage {
 	public long getPosition() {
 		return this.position;
 	}
-	public long getChunkSize() {
+	public int getChunkSize() {
 		return this.chunkSize; 
 	}
 	public void setPosition(long p1) {
 		this.position = p1;
 	}
 	
-	public void setChunkSize(long p2) {
+	public void setChunkSize(int p2) {
 		this.chunkSize = p2;
 	}
 	
@@ -147,7 +147,7 @@ public class PeerMessage {
 		case PeerMessageOps.OPCODE_DOWNLOAD_CHUNK: 
 			message.setFileName(dis.readUTF());
 			message.setPosition(dis.readLong());
-			message.setChunkSize(dis.readLong());
+			message.setChunkSize(dis.readInt());
 			break;
 		case PeerMessageOps.OPCODE_CHECK_FILE:
 			message.setFileName(dis.readUTF());
@@ -158,9 +158,9 @@ public class PeerMessage {
 			message.setFileName(dis.readUTF());
 			break; 
 		case PeerMessageOps.OPCODE_CHUNK_DOWNLOADED:
-			message.setChunkSize(dis.readLong());
-			message.setFileData(dis.readNBytes(message.getChunkSize());
-
+			message.setChunkSize(dis.readInt());
+			message.setFileData(dis.readNBytes(message.getChunkSize()));
+			break;
 		default:
 			System.err.println("PeerMessage.readMessageFromInputStream doesn't know how to parse this message opcode: "
 					+ PeerMessageOps.opcodeToOperation(opcode));
@@ -187,7 +187,7 @@ public class PeerMessage {
 		case PeerMessageOps.OPCODE_DOWNLOAD_CHUNK: 
 			dos.writeUTF(fileName);
 			dos.writeLong(position); 
-			dos.writeLong(chunkSize); 
+			dos.writeInt(chunkSize); 
 			break;
 		case PeerMessageOps.OPCODE_CHECK_FILE:
 			dos.writeUTF(fileName);
@@ -198,6 +198,7 @@ public class PeerMessage {
 			dos.writeUTF(fileName);
 			break; 
 		case PeerMessageOps.OPCODE_CHUNK_DOWNLOADED:
+			dos.writeInt(chunkSize);
 			dos.write(fileData);
 			break;
 
@@ -227,6 +228,7 @@ public class PeerMessage {
 			case PeerMessageOps.OPCODE_FILE_INFO:
 				s += fileSize; 
 				s += fileHash; 
+				s += fileName;
 			break;
 			case PeerMessageOps.OPCODE_CHUNK_DOWNLOADED:
 				s += fileData;

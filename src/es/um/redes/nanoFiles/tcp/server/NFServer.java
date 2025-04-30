@@ -207,7 +207,7 @@ public class NFServer extends Thread implements Runnable {
 						FileInfo file = FileInfo.lookupFilenameSubstring(NanoFiles.db.getFiles(), (String) messageFromClient.getFileName())[0];
 						
 						long pos = messageFromClient.getPosition();
-						long size = messageFromClient.getChunkSize();
+						int size = messageFromClient.getChunkSize();
 						
 						System.out.println(messageFromClient.toString());
 						
@@ -220,7 +220,7 @@ public class NFServer extends Thread implements Runnable {
 							RandomAccessFile archivo = new RandomAccessFile(f, "r");
 							archivo.seek(pos);
 							
-							byte[] datos = new byte[(int) size];
+							byte[] datos = new byte[size];
 							
 							
 							archivo.readFully(datos);
@@ -239,7 +239,7 @@ public class NFServer extends Thread implements Runnable {
 				
 				}
 				
-				System.out.println(responseToServer.toString());
+			
 				responseToServer.writeMessageToOutputStream(dos);
 				
 			}

@@ -138,25 +138,22 @@ public class NFConnector {
 		return this.trueFileName;
 	}
 	
-	public byte[] getFileChunk(String fileName, int conNum, int currDiv) {
+	public byte[] getFileChunk(String fileName, long inPos, int chunkSize) {
 		try {
 			PeerMessage message = new PeerMessage(PeerMessageOps.OPCODE_DOWNLOAD_CHUNK);
 			
-			long inPos = this.fileSize * (currDiv/conNum);
-			long tam = this.fileSize/conNum;
+			
 			
 			message.setFileName(fileName);
 			message.setPosition(inPos);
-			message.setChunkSize(tam);
-			System.out.println("Downloading " + tam + " bytes from file " + fileName + " in position " + inPos);
+			message.setChunkSize(chunkSize);
+			System.out.println("Downloading " + chunkSize + " bytes from file " + fileName + " in position " + inPos);
 			message.writeMessageToOutputStream(dos);
 			PeerMessage respuesta = PeerMessage.readMessageFromInputStream(dis);
-			System.out.println("holla stoy");
 			if(respuesta.getOpcode() == PeerMessageOps.OPCODE_FILE_NOT_FOUND) {
 				System.err.println("File could not be found when checking size and hash");
 				return null;
 			}
-			System.out.println(respuesta.toString());
 			return respuesta.getFileData();
 		}catch(IOException e) {
 			System.err.println("IOException when asking for fileHash");
