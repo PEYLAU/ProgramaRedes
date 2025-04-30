@@ -209,14 +209,14 @@ public class NFServer extends Thread implements Runnable {
 						long pos = messageFromClient.getPosition();
 						int size = messageFromClient.getChunkSize();
 						
-						System.out.println(messageFromClient.toString());
+						
 						
 						File f = new File(NanoFiles.db.lookupFilePath(file.fileHash));
 						if(!f.exists()) {
 							responseToServer = new PeerMessage(PeerMessageOps.OPCODE_FILE_NOT_FOUND);
 						}
 						else {
-							
+							System.out.println("Sending " + size + " bytes from file " + f.getName() + " in position " + pos);
 							RandomAccessFile archivo = new RandomAccessFile(f, "r");
 							archivo.seek(pos);
 							

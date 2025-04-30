@@ -11,6 +11,7 @@ import es.um.redes.nanoFiles.application.NanoFiles;
 
 
 import es.um.redes.nanoFiles.tcp.server.NFServer;
+import es.um.redes.nanoFiles.util.FileDigest;
 import es.um.redes.nanoFiles.util.FileInfo;
 
 public class NFControllerLogicP2P {
@@ -214,8 +215,19 @@ public class NFControllerLogicP2P {
 				byte[] data = con.getFileChunk(truename, inPos, chunkSize);
 				fos.write(data);
 				inPos += chunkSize;
-				totalRead += chunkSize;
+				totalRead -= chunkSize;
 				i++;
+			}
+			
+			String newHash = FileDigest.computeFileChecksumString(localFileName);
+
+			if(newHash.equals(currHash)) {
+				System.out.println("File downloaded successfully with matching hashes");
+				downloaded = true;
+			}
+			else {
+				System.err.println("File downloaded successfully but hashes don't match");
+				downloaded = false;
 			}
 			
 			
