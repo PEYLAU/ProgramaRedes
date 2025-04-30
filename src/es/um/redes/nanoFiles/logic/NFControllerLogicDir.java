@@ -166,7 +166,7 @@ public class NFControllerLogicDir {
 	 * 
 	 * @return Éxito o fracaso de la operación
 	 */
-	protected boolean unregisterFileServer() {
+	protected boolean unregisterFileServer(int serverPort) {
 		/*
 		 * Comunicarse con el directorio (a través del directoryConnector) para enviar
 		 * la lista de ficheros servidos por este peer. Los ficheros de la carpeta local
@@ -174,7 +174,7 @@ public class NFControllerLogicDir {
 		 * operación.
 		 */
 		boolean result = false;
-		if (this.directoryConnector.unregisterFileServer()) {
+		if (this.directoryConnector.unregisterFileServer(serverPort)) {
 			System.out.println("* File server successfully unregistered with the directory");
 			result = true;
 		} else {

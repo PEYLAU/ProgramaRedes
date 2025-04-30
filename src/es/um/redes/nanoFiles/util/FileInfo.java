@@ -45,7 +45,7 @@ public class FileInfo {
 		strBuf.append(String.format(" %1$-45s", fileHash));
 		
 		for(InetSocketAddress addr : fileAddress) {
-			strBuf.append(String.format(" %1$-10s",addr));
+			strBuf.append(String.format(" %1$-15s",addr));
 		}
 		
 		return strBuf.toString();
@@ -56,7 +56,7 @@ public class FileInfo {
 		strBuf.append(String.format("%1$-30s", "Name"));
 		strBuf.append(String.format("%1$10s", "Size"));
 		strBuf.append(String.format(" %1$-45s", "Hash"));
-		strBuf.append(String.format(" %1$-10s", "Addresses"));
+		strBuf.append(String.format(" %1$-15s", "Addresses"));
 		System.out.println(strBuf);
 		for (FileInfo file : files) {
 			System.out.println(file);

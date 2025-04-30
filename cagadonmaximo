@@ -1,6 +1,10 @@
 operation: ping\n
-sender: joaquin\n
-receiver: servernormandia\n
-function: tocarlapolla\n
-actions: tocamientodelapolla\n
+protocolID: protocolID\n
 \n
+
+operation: pingbad\n
+\n
+
+operation: pingok\n
+\n
+

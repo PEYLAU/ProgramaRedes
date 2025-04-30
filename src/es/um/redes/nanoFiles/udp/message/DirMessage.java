@@ -125,7 +125,7 @@ public class DirMessage {
 	}
 	
 	public void setFileNum(int value) {
-		if (!operation.equals(DirMessageOps.OPERATION_SEND_FILES)) {
+		if (!operation.equals(DirMessageOps.OPERATION_SEND_FILES) && !operation.equals(DirMessageOps.OPERATION_UNREGISTER_FILES)) {
 			throw new RuntimeException(
 					"DirMessage: setFileNum called for message of unexpected type (" + operation + ")");
 		}
@@ -238,6 +238,9 @@ public class DirMessage {
 			}
 			case FIELDNAME_FILE_SIZE:{
 				currSize = value;
+				f = new FileInfo(currHash, currName, Long.parseLong(currSize), currPath);
+				m.addFileInfo(f);
+				
 				break;
 			}
 			case FIELDNAME_FILE_ADDRESS:{
@@ -246,9 +249,7 @@ public class DirMessage {
 			}
 			case FIELDNAME_FILE_PORT: {
 				currPort = value;
-				f = new FileInfo(currHash, currName, Long.parseLong(currSize), currPath);
 				f.fileAddress.add(new InetSocketAddress(currAddress.substring(1), Integer.parseInt(currPort)));
-				m.addFileInfo(f);
 				break;
 			}
 			case FIELDNAME_SUBSTRING:{
@@ -272,7 +273,6 @@ public class DirMessage {
 
 
 			default:
-				System.err.println("calidad de aire razonable");
 				System.err.println("PANIC: DirMessage.fromString - message with unknown field name " + fieldName);
 				System.err.println("Message was:\n" + message);
 				System.exit(-1);
@@ -308,6 +308,7 @@ public class DirMessage {
 			sb.append(FIELDNAME_PROTOCOL + DELIMITER + protocolId + END_LINE);
 			break;
 		}
+		case DirMessageOps.OPERATION_UNREGISTER_FILES:
 		case DirMessageOps.OPERATION_SEND_FILES:{
 			sb.append(FIELDNAME_FILE_NUM + DELIMITER + fileNum + END_LINE);
 			for(FileInfo f : filelist) {

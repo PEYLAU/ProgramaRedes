@@ -45,7 +45,7 @@ public class NFServer extends Thread implements Runnable {
 		 */
 		
 		serverSocket = new ServerSocket();
-		serverSocket.bind(serverscktAddress);
+		serverSocket.bind(null);
 		
 		
 		

@@ -347,7 +347,6 @@ public class DirectoryConnector {
 				int size = messageResponse.getFileNum();
 				filelist = new FileInfo[size];
 				messageResponse.getFileList().toArray(filelist);
-				
 			}
 		
 		}
@@ -385,11 +384,11 @@ public class DirectoryConnector {
 						break;
 					}
 					case  DirMessageOps.OPERATION_BAD_NAME: {
-						System.err.println("ERROR, SUBCADENA DEMASIADA AMBIGUA");
+						System.err.println("ERROR, AMBIGUOUS NAME");
 						break;
 					}
 					case  DirMessageOps.OPERATION_NO_NAME: {
-						System.err.println("ERROR, NO EXISTE NINGÚN ARCHIVO CON DICHA SUBCADENA");
+						System.err.println("ERROR, NO FILE FOUND WITH THAT NAME");
 						break;
 					}
 				}
@@ -408,8 +407,28 @@ public class DirectoryConnector {
 	 * @return Verdadero si el directorio tiene registrado a este peer como servidor
 	 *         y ha dado de baja sus ficheros.
 	 */
-	public boolean unregisterFileServer() {
+	public boolean unregisterFileServer(int serverPort) {
 		boolean success = false;
+			
+		FileInfo[] files = NanoFiles.db.getFiles();
+		DirMessage m = new DirMessage(DirMessageOps.OPERATION_UNREGISTER_FILES);
+		m.setFileNum(files.length);
+		for(FileInfo f : files) {
+			f.fileAddress.add(new InetSocketAddress(directoryAddress.getAddress().getHostAddress(),serverPort));
+			m.addFileInfo(f);
+		}
+		
+		String mensaje = m.toString();
+		byte[] buffer = mensaje.getBytes();
+		byte[] buffrespuesta = sendAndReceiveDatagrams(buffer);
+		if(buffrespuesta != null) {
+			String buffrespuestaString = new String(buffrespuesta, 0, buffrespuesta.length);
+			DirMessage messageResponse = DirMessage.fromString(buffrespuestaString);
+			
+			if(messageResponse != null && messageResponse.getOperation().startsWith(DirMessageOps.OPERATION_SERVER_UNREGISTERED)) {
+				success = true;
+			}
+		}
 
 
 

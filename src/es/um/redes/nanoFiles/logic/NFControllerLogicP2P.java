@@ -300,8 +300,10 @@ public class NFControllerLogicP2P {
 
 	protected boolean serving() {
 		boolean result = false;
+		if(this.fileServer != null) {
+			result = fileServer.isAlive();
+		}
 		
-		result = fileServer.isAlive();
 
 
 		return result;

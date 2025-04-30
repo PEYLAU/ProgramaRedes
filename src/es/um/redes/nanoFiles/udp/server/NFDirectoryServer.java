@@ -225,7 +225,7 @@ public class NFDirectoryServer {
 		if(pkt != null) {
 			byte[] messageReceivedBuff = pkt.getData();
 			String messageReceived = new String(messageReceivedBuff, 0, messageReceivedBuff.length);
-			System.out.println("El mensaje recibido es: " + messageReceived);
+			System.out.println("Message received: " + messageReceived);
 			
 			responseMessage = DirMessage.fromString(messageReceived);
 			
@@ -299,8 +299,7 @@ public class NFDirectoryServer {
 			}
 			
 			msgToSend = new DirMessage(DirMessageOps.OPERATION_SERVER_REGISTERED);
-			System.out.println("Message to respond with: " + msgToSend.toString());
-			
+			System.out.println("Message to respond with: " + msgToSend.toString());	
 			break;
 		}
 		case DirMessageOps.OPERATION_REQUEST_FILELIST: {
@@ -354,6 +353,30 @@ public class NFDirectoryServer {
 			
 			System.out.println("Message to respond with: " + msgToSend.toString());
 			break; 
+		}
+		case DirMessageOps.OPERATION_UNREGISTER_FILES:{
+			int fileNum = responseMessage.getFileNum();
+			for(int i = 0; i < fileNum; i++) {
+				FileInfo f = responseMessage.getFileFromPos(i);
+				if(files.containsKey(f.fileName) && files.get(f.fileName).contains(f)) {
+					
+					FileInfo trueFile = files.get(f.fileName).get(files.get(f.fileName).indexOf(f));
+					for(InetSocketAddress addr : f.fileAddress) {
+						trueFile.fileAddress.remove(addr);
+						if(trueFile.fileAddress.isEmpty()) {
+							files.get(trueFile.fileName).remove(trueFile);
+						}
+					}
+					
+				}
+				
+				
+			}
+			
+			msgToSend = new DirMessage(DirMessageOps.OPERATION_SERVER_UNREGISTERED);
+			System.out.println("Message to respond with: " + msgToSend.toString());
+			
+			break;
 		}
 		
 

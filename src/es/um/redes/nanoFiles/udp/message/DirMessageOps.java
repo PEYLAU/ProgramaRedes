@@ -12,8 +12,10 @@ public class DirMessageOps {
 	public static final String OPERATION_PING_OK = "pingok";
 	public static final String OPERATION_PING_BAD = "pingbad";
 	public static final String OPERATION_SEND_FILES = "sendfiles";
+	public static final String OPERATION_UNREGISTER_FILES = "unregisterfiles";
 	public static final String OPERATION_SERVER_REGISTERED = "serverregistered";
-	public static final String OPERATION_REQUEST_FILELIST = "requestfilelist"; 
+	public static final String OPERATION_SERVER_UNREGISTERED = "serverunregistered";
+	public static final String OPERATION_REQUEST_FILELIST = "requestfilelist";
 	public static final String OPERATION_REQUEST_SERVER = "requestserver"; 
 	public static final String OPERATION_SERVER_LIST = "serverlist"; 
 	public static final String OPERATION_BAD_NAME = "badname"; 
