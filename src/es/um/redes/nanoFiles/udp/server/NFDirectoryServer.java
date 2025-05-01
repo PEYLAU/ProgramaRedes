@@ -281,7 +281,7 @@ public class NFDirectoryServer {
 
 			break;
 		}
-		case DirMessageOps.OPERATION_SEND_FILES: {
+		case DirMessageOps.OPERATION_REGISTER_SERVER: {
 			int fileNum = responseMessage.getFileNum();
 			for(int i = 0; i < fileNum; i++) {
 				FileInfo f = responseMessage.getFileFromPos(i);
@@ -342,13 +342,15 @@ public class NFDirectoryServer {
 			else {
 				msgToSend = new DirMessage(DirMessageOps.OPERATION_SERVER_LIST); 
 				LinkedList<FileInfo> l = files.get(trueString);
-				msgToSend.setAddressNum(l.size());
+				int addrNum = 0;
 				for(FileInfo f : l) {
 					for(InetSocketAddress addr : f.fileAddress) {
 						msgToSend.addAddress(addr);
+						addrNum++;
 					}
 					
 				}
+				msgToSend.setAddressNum(addrNum);
 			}
 			
 			System.out.println("Message to respond with: " + msgToSend.toString());

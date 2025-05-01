@@ -13,6 +13,7 @@ import java.net.UnknownHostException;
 import es.um.redes.nanoFiles.tcp.message.PeerMessage;
 import es.um.redes.nanoFiles.tcp.message.PeerMessageOps;
 import es.um.redes.nanoFiles.util.FileDigest;
+import es.um.redes.nanoFiles.util.FileInfo;
 
 //Esta clase proporciona la funcionalidad necesaria para intercambiar mensajes entre el cliente y el servidor
 public class NFConnector {
@@ -89,9 +90,14 @@ public class NFConnector {
 				System.err.println("File could not be found when checking size/hash");
 				return false;
 			}
-			this.fileSize = respuesta.getFileSize();
-			this.fileHash = respuesta.getFileHash();
-			this.trueFileName = respuesta.getFileName();
+			else if(respuesta.getOpcode() == PeerMessageOps.OPCODE_FILE_INFO) {
+				this.fileSize = respuesta.getFileSize();
+				this.fileHash = respuesta.getFileHash();
+				this.trueFileName = respuesta.getFileName();
+			}
+			else {
+				return false;
+			}
 		}catch(IOException e) {
 			System.err.println("IOException when asking for fileInfo");
 			return false;
@@ -127,10 +133,10 @@ public class NFConnector {
 	}
 	
 	public String getFileTrueName(String fileName) {
-		if(this.fileSize == -1) {
+		if(this.trueFileName == null) {
 			boolean success = getFileInfo(fileName);
 			if(!success) {
-				System.err.println("Could not obtain Size");
+				System.err.println("Could not obtain FileName");
 				return null;
 			}
 		}
@@ -154,7 +160,11 @@ public class NFConnector {
 				System.err.println("File could not be found when checking size and hash");
 				return null;
 			}
-			return respuesta.getFileData();
+			else if(respuesta.getOpcode() == PeerMessageOps.OPCODE_CHUNK_DOWNLOADED) {
+				return respuesta.getFileData();
+			}
+			return null;
+			
 		}catch(IOException e) {
 			System.err.println("IOException when asking for fileHash");
 			return null;
@@ -162,6 +172,11 @@ public class NFConnector {
 	}
 
 
+	
+	public boolean uploadFile(FileInfo file, String serverToUpload) {
+		
+	}
+	
 
 
 	public InetSocketAddress getServerAddr() {

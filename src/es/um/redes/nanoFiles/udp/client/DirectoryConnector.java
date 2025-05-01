@@ -302,7 +302,7 @@ public class DirectoryConnector {
 
 		// TODO: Ver TODOs en pingDirectory y seguir esquema similar
 		
-		DirMessage m = new DirMessage(DirMessageOps.OPERATION_SEND_FILES);
+		DirMessage m = new DirMessage(DirMessageOps.OPERATION_REGISTER_SERVER);
 		m.setFileNum(files.length);
 		for(FileInfo f : files) {
 			f.fileAddress.add(new InetSocketAddress(directoryAddress.getAddress().getHostAddress(),serverPort));
@@ -333,7 +333,7 @@ public class DirectoryConnector {
 	 *         pudo satisfacer nuestra solicitud
 	 */
 	public FileInfo[] getFileList() {
-		FileInfo[] filelist = new FileInfo[0];
+		FileInfo[] filelist = null;
 		// TODO: Ver TODOs en pingDirectory y seguir esquema similar
 		
 		DirMessage m = new DirMessage(DirMessageOps.OPERATION_REQUEST_FILELIST);
@@ -376,6 +376,7 @@ public class DirectoryConnector {
 		if(buffrespuesta != null) {
 			String buffrespuestaString = new String(buffrespuesta, 0, buffrespuesta.length);
 			DirMessage messageResponse = DirMessage.fromString(buffrespuestaString);
+			System.out.println(messageResponse.toString());
 			if(messageResponse != null) {
 				switch(messageResponse.getOperation()) {
 					case DirMessageOps.OPERATION_SERVER_LIST: {

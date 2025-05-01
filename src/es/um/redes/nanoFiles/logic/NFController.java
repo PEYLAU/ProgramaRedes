@@ -135,6 +135,9 @@ public class NFController {
 				if (serverRunning) {
 					commandSucceeded = controllerDir.registerFileServer(controllerPeer.getServerPort(),
 							NanoFiles.db.getFiles());
+					if(!commandSucceeded) {
+						controllerPeer.stopFileServer();
+					}
 				} else {
 					System.err.println("Cannot start file server");
 				}

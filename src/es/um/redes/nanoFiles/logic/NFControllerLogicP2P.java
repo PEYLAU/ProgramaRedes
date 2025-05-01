@@ -178,10 +178,11 @@ public class NFControllerLogicP2P {
 				currHash = con.getFileHash(targetFileNameSubstring);
 				currSize = con.getFileSize(targetFileNameSubstring);
 				truename = con.getFileTrueName(targetFileNameSubstring);
+				System.out.println(currHash);
 				if(s == null) {
 					s = currHash;
 				}
-				else if(s != currHash) {
+				else if(!s.equals(currHash)) {
 					System.err.println("Found different files with same name");
 					return false;
 				}
@@ -290,6 +291,7 @@ public class NFControllerLogicP2P {
 	protected void stopFileServer() {
 		
 		fileServer.stopServer();
+		fileServer = null;
 		/*
 		 * TODO: Enviar señal para detener nuestro servidor de ficheros en segundo plano
 		 */
@@ -311,11 +313,11 @@ public class NFControllerLogicP2P {
 	}
 
 	protected boolean uploadFileToServer(FileInfo matchingFile, String uploadToServer) {
-		boolean result = false;
+		
 
+		NFConnector downloader = new NFConnector(new InetSocketAddress(uploadToServer));
 
-
-		return result;
+		return downloader.uploadFile(matchingFile, uploadToServer);
 	}
 
 }

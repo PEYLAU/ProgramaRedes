@@ -106,10 +106,15 @@ public class NFControllerLogicDir {
 		 * por pantalla (método FileInfo.printToSysout). Devolver éxito/fracaso de la
 		 * operación.
 		 */
-		FileInfo[] trackedFiles = directoryConnector.getFileList(); //
-		System.out.println(
-				"* These are the files tracked by the directory at " + directoryConnector.getDirectoryHostname());
-		FileInfo.printToSysout(trackedFiles);
+		FileInfo[] trackedFiles = directoryConnector.getFileList();
+		if(trackedFiles == null) {
+			System.err.println("Information of files couldn't be obtained");
+		}
+		else {
+			System.out.println(
+					"* These are the files tracked by the directory at " + directoryConnector.getDirectoryHostname());
+			FileInfo.printToSysout(trackedFiles);
+		}
 	}
 
 	/**
