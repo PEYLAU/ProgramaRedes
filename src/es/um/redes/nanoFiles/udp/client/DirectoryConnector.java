@@ -308,7 +308,7 @@ public class DirectoryConnector {
 		DirMessage m = new DirMessage(DirMessageOps.OPERATION_REGISTER_SERVER);
 		m.setFileNum(files.length);
 		for(FileInfo f : files) {
-			f.fileAddress.add(new InetSocketAddress(directoryAddress.getAddress().getHostAddress(),serverPort));
+			f.fileAddress.add(new InetSocketAddress(getActiveAddress(),serverPort));
 			m.addFileInfo(f);
 		}
 		
