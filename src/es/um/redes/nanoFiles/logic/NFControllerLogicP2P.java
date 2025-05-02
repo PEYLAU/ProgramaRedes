@@ -154,7 +154,7 @@ public class NFControllerLogicP2P {
 		}
 		try {
 	
-			File f = new File(localFileName);
+			File f = new File(NanoFiles.sharedDirname + '/' + localFileName);
 			/*
 			 * ESTO ES PARA PROBAR LUEGO HAY QUE QUITAR EL COMENTARIO
 			if(f.exists()) {
@@ -178,7 +178,6 @@ public class NFControllerLogicP2P {
 				currHash = con.getFileHash(targetFileNameSubstring);
 				currSize = con.getFileSize(targetFileNameSubstring);
 				truename = con.getFileTrueName(targetFileNameSubstring);
-				System.out.println(currHash);
 				if(s == null) {
 					s = currHash;
 				}
