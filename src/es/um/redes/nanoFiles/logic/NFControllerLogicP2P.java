@@ -219,7 +219,7 @@ public class NFControllerLogicP2P {
 				i++;
 			}
 			
-			String newHash = FileDigest.computeFileChecksumString(localFileName);
+			String newHash = FileDigest.computeFileChecksumString(NanoFiles.sharedDirname + '/' + localFileName);
 
 			if(newHash.equals(currHash)) {
 				System.out.println("File downloaded successfully with matching hashes");
@@ -277,8 +277,10 @@ public class NFControllerLogicP2P {
 		/*
 		 * TODO: Devolver el puerto de escucha de nuestro servidor de ficheros
 		 */
-
-		port = fileServer.getServerPort();
+		if(fileServer != null) {
+			port = fileServer.getServerPort();
+		}
+		
 
 		return port;
 	}
@@ -288,9 +290,11 @@ public class NFControllerLogicP2P {
 	 * 
 	 */
 	protected void stopFileServer() {
+		if(fileServer != null) {
+			fileServer.stopServer();
+			fileServer = null;
+		}
 		
-		fileServer.stopServer();
-		fileServer = null;
 		/*
 		 * TODO: Enviar señal para detener nuestro servidor de ficheros en segundo plano
 		 */

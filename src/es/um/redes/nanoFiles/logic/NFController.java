@@ -169,8 +169,8 @@ public class NFController {
 			 * unregisterFileServer).
 			 */
 			if (controllerPeer.serving()) {
-				controllerPeer.stopFileServer();
 				commandSucceeded = controllerDir.unregisterFileServer(controllerPeer.getServerPort());
+				controllerPeer.stopFileServer();
 			}
 			break;
 		case NFCommands.COM_UPLOAD:
