@@ -315,9 +315,10 @@ public class NFControllerLogicP2P {
 	protected boolean uploadFileToServer(FileInfo matchingFile, String uploadToServer) {
 		
 
-		NFConnector downloader = new NFConnector(new InetSocketAddress(uploadToServer));
+		//NFConnector downloader = new NFConnector(new InetSocketAddress(uploadToServer));
 
-		return downloader.uploadFile(matchingFile, uploadToServer);
+		//return downloader.uploadFile(matchingFile, uploadToServer);
+		return false;
 	}
 
 }

@@ -173,9 +173,7 @@ public class NFConnector {
 
 
 	
-	public boolean uploadFile(FileInfo file, String serverToUpload) {
-		
-	}
+
 	
 
 
