@@ -5,8 +5,11 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
+import java.util.Enumeration;
 
 import es.um.redes.nanoFiles.application.NanoFiles;
 import es.um.redes.nanoFiles.udp.message.DirMessage;
@@ -415,7 +418,7 @@ public class DirectoryConnector {
 		DirMessage m = new DirMessage(DirMessageOps.OPERATION_UNREGISTER_FILES);
 		m.setFileNum(files.length);
 		for(FileInfo f : files) {
-			f.fileAddress.add(new InetSocketAddress(directoryAddress.getAddress().getHostAddress(),serverPort));
+			f.fileAddress.add(new InetSocketAddress(getActiveAddress(),serverPort));
 			m.addFileInfo(f);
 		}
 		
@@ -438,6 +441,40 @@ public class DirectoryConnector {
 	}
 
 
+	private String getActiveAddress() {
+
+		String activeAddress = null;
+
+		try {
+			Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+			while (interfaces.hasMoreElements()) {
+				NetworkInterface networkInterface = interfaces.nextElement();
+				if(!networkInterface.isUp() || networkInterface.isLoopback() || networkInterface.isVirtual())
+					continue;
+	
+				Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
+	
+				while(addresses.hasMoreElements()) {
+	
+					InetAddress address = addresses.nextElement();
+	
+					if(!address.isLoopbackAddress() && address instanceof InetAddress) {
+	
+						activeAddress = new String(address.getHostAddress());
+
+						}
+
+					}
+
+				}
+
+		}catch(SocketException e) {
+			e.printStackTrace();
+		}
+
+		return activeAddress;
+
+	}
 
 
 }
