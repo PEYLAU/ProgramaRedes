@@ -1,6 +1,0 @@
-operation: ping\n
-sender: joaquin\n
-receiver: servernormandia\n
-function: tocarlapolla\n
-actions: tocamientodelapolla\n
-\n
