@@ -171,31 +171,6 @@ public class NFConnector {
 	}
 
 
-	public boolean uploadFile(FileInfo fileToUpload) {
-		try {
-			PeerMessage message = new PeerMessage(PeerMessageOps.OPCODE_SET_UPLOAD_FILE);
-			
-			
-			
-			
-			message.writeMessageToOutputStream(dos);
-			PeerMessage respuesta = PeerMessage.readMessageFromInputStream(dis);
-			if(respuesta.getOpcode() == PeerMessageOps.OPCODE_FILE_EXISTS) {
-				return false;
-			}
-			
-			
-		}catch(IOException e) {
-			System.err.println("IOException when asking for fileHash");
-			return false;
-		}
-		
-		
-		
-		
-		return false;
-	}
-
 	
 	public void freeConnector() {
 		try {

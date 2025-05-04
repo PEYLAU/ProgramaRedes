@@ -155,13 +155,12 @@ public class NFControllerLogicP2P {
 		try {
 	
 			File f = new File(NanoFiles.sharedDirname + '/' + localFileName);
-			/*
-			 * ESTO ES PARA PROBAR LUEGO HAY QUE QUITAR EL COMENTARIO
+			
 			if(f.exists()) {
 				System.err.println("* The file already exists in this machine");
 				return false;
 			}
-			*/
+			
 			
 		
 			NFConnector[] connectors = new NFConnector[serverAddressList.length];
@@ -320,16 +319,7 @@ public class NFControllerLogicP2P {
 	protected boolean uploadFileToServer(FileInfo matchingFile, String uploadToServer) {
 		boolean retval = false;
 
-		try {
-			NFConnector downloader = new NFConnector(new InetSocketAddress(uploadToServer, getServerPort()));
-			retval = downloader.uploadFile(matchingFile);
-		}catch(UnknownHostException e) {
-			System.err.println("Host address could not be determined properly");
-
-		}catch (IOException io) {
-			System.err.println("IOException thrown on upload");
-			io.printStackTrace();
-		}
+		
 
 		return retval;
 	}
