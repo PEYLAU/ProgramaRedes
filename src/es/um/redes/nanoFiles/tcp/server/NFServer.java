@@ -4,6 +4,7 @@ import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -93,7 +94,11 @@ public class NFServer extends Thread implements Runnable {
 			 */
 			
 			if(connectionOk) {
+				try {
 				serveFilesToClient(socket);
+				}catch(IOException e) {
+					e.printStackTrace();
+				}
 			}
 			
 
@@ -120,6 +125,7 @@ public class NFServer extends Thread implements Runnable {
 				
 				if(stop) {
 					serverSocket.close();
+					break;
 				}
 				
 				
@@ -172,7 +178,7 @@ public class NFServer extends Thread implements Runnable {
 	 * @param socket El socket para la comunicación con un cliente que desea
 	 *               descargar ficheros.
 	 */
-	public static void serveFilesToClient(Socket socket) {
+	public static void serveFilesToClient(Socket socket) throws IOException{
 		/*
 		 * TODO: (Boletín SocketsTCP) Crear dis/dos a partir del socket
 		 */
@@ -245,9 +251,6 @@ public class NFServer extends Thread implements Runnable {
 			}
 		}catch(FileNotFoundException f){
 			System.err.println("Error, file doesn't exist");
-		}
-		catch(IOException e) {
-			e.printStackTrace();
 		}
 		/*
 		 * TODO: (Boletín SocketsTCP) Mientras el cliente esté conectado, leer mensajes

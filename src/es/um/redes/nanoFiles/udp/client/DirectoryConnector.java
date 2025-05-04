@@ -379,7 +379,6 @@ public class DirectoryConnector {
 		if(buffrespuesta != null) {
 			String buffrespuestaString = new String(buffrespuesta, 0, buffrespuesta.length);
 			DirMessage messageResponse = DirMessage.fromString(buffrespuestaString);
-			System.out.println(messageResponse.toString());
 			if(messageResponse != null) {
 				switch(messageResponse.getOperation()) {
 					case DirMessageOps.OPERATION_SERVER_LIST: {
@@ -388,7 +387,7 @@ public class DirectoryConnector {
 						break;
 					}
 					case  DirMessageOps.OPERATION_BAD_NAME: {
-						System.err.println("ERROR, AMBIGUOUS NAME");
+						System.err.println("ERROR, AMBIGUOUS NAME, MULTIPLE FILES WITH SAME SUBSTRING");
 						break;
 					}
 					case  DirMessageOps.OPERATION_NO_NAME: {

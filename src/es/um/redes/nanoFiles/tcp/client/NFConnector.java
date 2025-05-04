@@ -40,7 +40,7 @@ public class NFConnector {
 		 * conexión TCP ha sido establecida.
 		 */
 		
-		
+	
 		socket = new Socket(serverAddr.getAddress(), serverAddr.getPort());
 		/*
 		 * TODO: (Boletín SocketsTCP) Se crean los DataInputStream/DataOutputStream a
@@ -53,7 +53,6 @@ public class NFConnector {
 		if(dis == null || dos == null) {
 			throw new IOException();
 		}
-
 	}
 	
 	
@@ -172,10 +171,46 @@ public class NFConnector {
 	}
 
 
-	
+	public boolean uploadFile(FileInfo fileToUpload) {
+		try {
+			PeerMessage message = new PeerMessage(PeerMessageOps.OPCODE_SET_UPLOAD_FILE);
+			
+			
+			
+			
+			message.writeMessageToOutputStream(dos);
+			PeerMessage respuesta = PeerMessage.readMessageFromInputStream(dis);
+			if(respuesta.getOpcode() == PeerMessageOps.OPCODE_FILE_EXISTS) {
+				return false;
+			}
+			
+			
+		}catch(IOException e) {
+			System.err.println("IOException when asking for fileHash");
+			return false;
+		}
+		
+		
+		
+		
+		return false;
+	}
 
 	
+	public void freeConnector() {
+		try {
+			dis.close();
+			dos.close();
+			socket.close();
+		}catch(IOException e) {
+			System.err.println("Error when closing NFConnector");
+			e.printStackTrace();
+		}
+		
+	}
 
+
+	
 
 	public InetSocketAddress getServerAddr() {
 		return serverAddr;

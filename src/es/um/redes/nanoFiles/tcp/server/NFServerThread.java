@@ -26,7 +26,21 @@ public class NFServerThread extends Thread {
 	public void run() {
 		
 		while(socket.isConnected()) {
-			NFServer.serveFilesToClient(socket);
+			try {
+				NFServer.serveFilesToClient(socket);
+			}catch(IOException e) {
+				if(socket.isClosed()) {
+					try {
+						socket.close();
+						socket = null;
+						break;
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+					
+				}
+			}
+			
 		}
 
 	}

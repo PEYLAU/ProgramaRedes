@@ -156,8 +156,7 @@ public class FileInfo {
 			return false;
 		FileInfo other = (FileInfo) obj;
 		
-		return fileHash.equals(other.fileHash) && fileName.equals(other.fileName) &&
-				filePath.equals(other.filePath) && fileSize == other.fileSize;
+		return fileHash.equals(other.fileHash) && fileName.equals(other.fileName) && fileSize == other.fileSize;
 	}
 }
 

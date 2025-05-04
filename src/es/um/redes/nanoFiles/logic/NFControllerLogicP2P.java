@@ -230,7 +230,9 @@ public class NFControllerLogicP2P {
 				downloaded = false;
 			}
 			
-			
+			for(NFConnector con : connectors) {
+				con.freeConnector();
+			}
 			
 			 
 			
@@ -239,7 +241,7 @@ public class NFControllerLogicP2P {
 			System.err.println("Host address could not be determined properly");
 
 		}catch (IOException io) {
-			System.err.println("IOException thrown on connector creation");
+			System.err.println("IOException thrown on download");
 			io.printStackTrace();
 		}
 		
@@ -316,12 +318,20 @@ public class NFControllerLogicP2P {
 	}
 
 	protected boolean uploadFileToServer(FileInfo matchingFile, String uploadToServer) {
-		
+		boolean retval = false;
 
-		//NFConnector downloader = new NFConnector(new InetSocketAddress(uploadToServer));
+		try {
+			NFConnector downloader = new NFConnector(new InetSocketAddress(uploadToServer, getServerPort()));
+			retval = downloader.uploadFile(matchingFile);
+		}catch(UnknownHostException e) {
+			System.err.println("Host address could not be determined properly");
 
-		//return downloader.uploadFile(matchingFile, uploadToServer);
-		return false;
+		}catch (IOException io) {
+			System.err.println("IOException thrown on upload");
+			io.printStackTrace();
+		}
+
+		return retval;
 	}
 
 }

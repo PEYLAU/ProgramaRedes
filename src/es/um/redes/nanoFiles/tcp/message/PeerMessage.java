@@ -98,8 +98,6 @@ public class PeerMessage {
 	}
 	
 	
-	
-	
 	public byte[] getFileData() {
 		return this.fileData;
 	}
@@ -137,7 +135,6 @@ public class PeerMessage {
 		 * Usar dis.readFully para leer un array de bytes, dis.readInt para leer un
 		 * entero, etc.
 		 */
-		
 		byte opcode = dis.readByte();
 		PeerMessage message = new PeerMessage(opcode);
 		switch (opcode) {
